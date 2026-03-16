@@ -43,6 +43,12 @@ const CloseIcon = () => (
   </svg>
 )
 
+const LogoutIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+)
+
 /* ── Type icon configs ─────────────────────────────── */
 const TYPE_CFG: Record<Notification['type'], { color: string; icon: React.ReactNode }> = {
   info:    { color: 'var(--accent, #006AFF)', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> },
@@ -158,6 +164,19 @@ export default function Topbar() {
       <div className="topbar-spacer" />
 <button className="topbar-btn" onClick={toggleTheme} style={{ width: 34, padding: '6px', justifyContent: 'center' }} title="Toggle dark mode">
         {themeReady ? (darkMode ? <SunIcon /> : <MoonIcon />) : <MoonIcon />}
+      </button>
+
+      {/* Logout */}
+      <button
+        className="topbar-btn"
+        onClick={async () => {
+          const { signOut } = await import('@/lib/auth-actions')
+          await signOut()
+        }}
+        style={{ width: 34, padding: '6px', justifyContent: 'center' }}
+        title="Logout"
+      >
+        <LogoutIcon />
       </button>
 
       {/* ── Bell + Dropdown ── */}
