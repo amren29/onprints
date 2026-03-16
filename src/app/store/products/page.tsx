@@ -28,10 +28,10 @@ export default function ProductsPage() {
         if (!res.ok) throw new Error('Failed to fetch products')
         const { products, categories: cats } = await res.json()
 
-        const catMap = new Map((cats || []).map((c: any) => [c.id, c.name]))
+        const catMap = new Map<string, string>((cats || []).map((c: any) => [c.id, c.name]))
         const converted = (products || [])
           .filter((p: any) => p.status === 'Active' && p.visibility === 'published')
-          .map((p: any) => dbProductToProduct(p, catMap.get(p.category_id ?? '') ?? ''))
+          .map((p: any) => dbProductToProduct(p, catMap.get(p.category_id ?? '') || ''))
 
         if (!cancelled) {
           setAllProducts(converted)
