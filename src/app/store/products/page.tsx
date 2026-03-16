@@ -8,8 +8,8 @@ import Footer from '@/components/store/Footer'
 import CategoryIcon from '@/components/store/CategoryIcon'
 import AnimateIn from '@/components/store/AnimateIn'
 import NewsletterCTA from '@/components/store/NewsletterCTA'
-import { getStoreProducts, getStoreCategories } from '@/lib/store/catalog-bridge'
 import type { Product } from '@/types/store'
+import { dbProductToProduct } from '@/lib/store/catalog-bridge'
 
 export default function ProductsPage() {
   const searchParams = useSearchParams()
@@ -24,13 +24,27 @@ export default function ProductsPage() {
     let cancelled = false
     async function load() {
       try {
-        const [prods, cats] = await Promise.all([
-          getStoreProducts(),
-          getStoreCategories(),
-        ])
+        const res = await fetch('/api/store/products')
+        if (!res.ok) throw new Error('Failed to fetch products')
+        const { products, categories: cats } = await res.json()
+
+        const catMap = new Map((cats || []).map((c: any) => [c.id, c.name]))
+        const converted = (products || [])
+          .filter((p: any) => p.status === 'Active' && p.visibility === 'published')
+          .map((p: any) => dbProductToProduct(p, catMap.get(p.category_id ?? '') ?? ''))
+
         if (!cancelled) {
-          setAllProducts(prods)
-          setCategories(cats)
+          setAllProducts(converted)
+          // Build category list from products
+          const seen = new Set<string>()
+          const catList: { id: string; label: string; description: string }[] = []
+          converted.forEach((p: Product) => {
+            if (!seen.has(p.category)) {
+              seen.add(p.category)
+              catList.push({ id: p.category, label: p.category.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), description: '' })
+            }
+          })
+          setCategories(catList)
         }
       } catch (err) {
         console.error('[Store Products] Failed to load:', err)

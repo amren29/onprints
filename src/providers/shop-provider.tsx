@@ -31,6 +31,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     if (initRef.current) return
     initRef.current = true
 
+    // Skip server action calls on store pages (they use NEXT_PUBLIC_SHOP_ID instead)
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/store')) {
+      setState(s => ({ ...s, isLoading: false }))
+      return
+    }
+
     async function init() {
       try {
         const result = await getUserShop()
