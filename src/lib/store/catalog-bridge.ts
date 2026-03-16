@@ -2,8 +2,18 @@
  * Bridge between admin DbProduct (Supabase) and store Product type.
  * Converts DB products into the Product shape the online store expects.
  */
-import { type DbProduct, type DbCategory } from '@/lib/db/catalog'
 import type { Product, ProductCategory, SpecOption, PricingMatrix } from '@/types/store'
+
+// Local types to avoid importing from 'use server' module (breaks Cloudflare Workers)
+type DbProduct = {
+  id: string; shop_id: string; name: string; sku: string; description: string;
+  category_id: string | null; status: string; visibility: string;
+  pricing_type: string; base_price: number; pricing: unknown; sizes: unknown;
+  option_groups: unknown[] | null; main_image: string | null; images: unknown;
+  notes: string | null; product_info: unknown; bulk_variant: boolean;
+  seq_id: string; created_at: string; updated_at: string;
+}
+type DbCategory = { id: string; shop_id: string; name: string; created_at: string }
 
 /* ── Category mapping ─────────────────────────────── */
 const CATEGORY_MAP: Record<string, ProductCategory> = {
