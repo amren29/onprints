@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 interface StoreContextValue {
   shopId: string
@@ -22,14 +23,19 @@ export function useStore() {
   return useContext(StoreContext)
 }
 
-interface StoreProviderProps {
-  children: ReactNode
-  slug?: string
-  mode?: 'slug' | 'legacy'
-}
+export function StoreProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-export function StoreProvider({ children, slug, mode }: StoreProviderProps) {
-  const isLegacy = mode === 'legacy' || !slug
+  // Detect slug from browser URL (/s/[slug]/...) or middleware rewrite param
+  const slug = useMemo(() => {
+    if (pathname.startsWith('/s/')) return pathname.split('/')[2] || ''
+    return searchParams.get('_slug') || ''
+  }, [pathname, searchParams])
+
+  const isLegacy = !slug
+  const basePath = isLegacy ? '/store' : `/s/${slug}`
+
   const [shop, setShop] = useState<{ id: string; slug: string; name: string } | null>(null)
   const [isLoading, setIsLoading] = useState(!isLegacy)
 
@@ -64,10 +70,9 @@ export function StoreProvider({ children, slug, mode }: StoreProviderProps) {
   }, [slug, isLegacy])
 
   const shopId = shop?.id || (isLegacy ? (process.env.NEXT_PUBLIC_SHOP_ID || '') : '')
-  const basePath = isLegacy ? '/store' : `/s/${slug}`
 
   return (
-    <StoreContext.Provider value={{ shopId, slug: slug || '', basePath, shop, isLoading }}>
+    <StoreContext.Provider value={{ shopId, slug, basePath, shop, isLoading }}>
       {children}
     </StoreContext.Provider>
   )

@@ -11,25 +11,27 @@ export default function StoreLayout({
   children: React.ReactNode
 }) {
   return (
-    <StoreProvider mode="legacy">
-      <div
-        id="store-scroll-root"
-        className="store-root antialiased"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          overflow: 'auto',
-          background: '#ffffff',
-          color: '#111827',
-          zIndex: 0,
-        }}
-      >
-        <Suspense>
-          <AffiliateCapture />
-          <CartTracker />
-        </Suspense>
-        {children}
-      </div>
-    </StoreProvider>
+    <Suspense>
+      <StoreProvider>
+        <div
+          id="store-scroll-root"
+          className="store-root antialiased"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            overflow: 'auto',
+            background: '#ffffff',
+            color: '#111827',
+            zIndex: 0,
+          }}
+        >
+          <Suspense>
+            <AffiliateCapture />
+            <CartTracker />
+          </Suspense>
+          {children}
+        </div>
+      </StoreProvider>
+    </Suspense>
   )
 }

@@ -19,6 +19,22 @@ function isPublicRoute(path: string): boolean {
 }
 
 export async function updateSession(request: NextRequest) {
+  const path = request.nextUrl.pathname
+
+  // Rewrite /s/[slug]/... → /store/... (pass slug via query param)
+  if (path.startsWith('/s/')) {
+    const segments = path.split('/') // ['', 's', 'my-shop', 'products', ...]
+    const slug = segments[2]
+    if (slug) {
+      const rest = '/' + segments.slice(3).join('/') // '/products/...'
+      const storePath = '/store' + (rest === '/' ? '' : rest)
+      const url = request.nextUrl.clone()
+      url.pathname = storePath
+      url.searchParams.set('_slug', slug)
+      return NextResponse.rewrite(url)
+    }
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -47,7 +63,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const path = request.nextUrl.pathname
   const isPublic = isPublicRoute(path)
   const isAuthPage = path === '/login' || path === '/register' || path === '/reset-password' || path === '/verify-email'
 
