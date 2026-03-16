@@ -1,0 +1,375 @@
+/* ══════════════════════════════════════════════════════
+   Builder — Buildo/Webflow-style website builder
+═══════════════════════════════════════════════════════ */
+
+/* ── Shell & Top Bar ─────────────────────────────────── */
+.builder-shell {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; flex-direction: column;
+  background: #f5f5f7; font-family: var(--font);
+}
+
+.builder-topbar {
+  height: 48px; flex-shrink: 0;
+  display: flex; align-items: center;
+  padding: 0 14px; gap: 12px;
+  background: #fff; border-bottom: 1px solid #e2e2e5;
+}
+
+.builder-topbar-left {
+  display: flex; align-items: center; gap: 8px;
+  min-width: 0;
+}
+
+.builder-topbar-center {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+
+.builder-topbar-right {
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Device toggle group */
+.builder-device-group {
+  display: flex; align-items: center;
+  border: 1px solid #e2e2e5; border-radius: 8px;
+  overflow: hidden; background: #f5f5f7;
+}
+
+.builder-device-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 30px;
+  border: none; background: transparent;
+  cursor: pointer; color: #9ca3af;
+  transition: all 0.15s;
+}
+.builder-device-btn:hover { color: #6b7280; }
+.builder-device-btn.active {
+  background: #fff; color: #111;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Undo/Redo group */
+.builder-undo-group {
+  display: flex; align-items: center;
+  border: 1px solid #e2e2e5; border-radius: 8px;
+  overflow: hidden; background: #f5f5f7;
+}
+
+.builder-undo-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 30px;
+  border: none; background: transparent;
+  cursor: pointer; color: #9ca3af;
+  transition: color 0.15s;
+}
+.builder-undo-btn:hover:not(:disabled) { color: #374151; }
+.builder-undo-btn:disabled { opacity: 0.35; cursor: default; }
+.builder-undo-btn + .builder-undo-btn { border-left: 1px solid #e2e2e5; }
+
+/* Publish button */
+.builder-publish-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 18px; height: 32px;
+  border-radius: 8px; border: none;
+  background: #006AFF; color: #fff;
+  font-size: 12.5px; font-weight: 600;
+  cursor: pointer; font-family: var(--font);
+  transition: background 0.15s;
+}
+.builder-publish-btn:hover { background: #006AFF; }
+
+/* Avatar */
+.builder-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #e2e2e5; color: #6b7280;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Body (below topbar) ─────────────────────────────── */
+.builder-body {
+  flex: 1; min-height: 0;
+  display: flex;
+}
+
+/* ── Vertical Icon Toolbar (far left, 48px) ──────────── */
+.builder-toolbar {
+  width: 48px; flex-shrink: 0;
+  background: #fff; border-right: 1px solid #e2e2e5;
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 8px 0; gap: 2px;
+}
+.builder-toolbar-spacer { flex: 1; }
+
+.builder-toolbar-btn {
+  width: 36px; height: 36px; border-radius: 8px;
+  border: none; background: transparent;
+  cursor: pointer; color: #9ca3af;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.builder-toolbar-btn:hover { background: #f0f0f3; color: #374151; }
+.builder-toolbar-btn.active {
+  background: #111; color: #fff;
+}
+
+/* ── Left Main Panel (~260px) ────────────────────────── */
+.builder-left-panel {
+  width: 260px; flex-shrink: 0;
+  background: #fff; border-right: 1px solid #e2e2e5;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.builder-left-tabs {
+  display: flex; padding: 0 12px;
+  border-bottom: 1px solid #e2e2e5;
+  flex-shrink: 0;
+}
+.builder-left-tab {
+  flex: 1; padding: 10px 0;
+  border: none; background: transparent;
+  font-size: 12px; font-weight: 500;
+  color: #9ca3af; cursor: pointer;
+  font-family: var(--font);
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.builder-left-tab:hover { color: #6b7280; }
+.builder-left-tab.active {
+  color: #111; font-weight: 600;
+  border-bottom-color: #111;
+}
+
+.builder-left-search {
+  margin: 8px 12px 4px;
+  padding: 7px 10px 7px 32px;
+  border: 1px solid #e2e2e5; border-radius: 8px;
+  font-size: 12px; font-family: var(--font);
+  outline: none; background: #f9f9fb;
+  color: #111; transition: border-color 0.15s;
+  width: calc(100% - 24px);
+  box-sizing: border-box;
+}
+.builder-left-search:focus { border-color: #3b82f6; }
+
+/* Section groups */
+.builder-section-group { border-bottom: 1px solid #f0f0f3; }
+
+.builder-section-group-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer; user-select: none;
+}
+.builder-section-group-header:hover { background: #fafafa; }
+
+.builder-section-group-label {
+  font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: #6b7280;
+}
+
+/* Section thumbnail grid */
+.builder-section-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px; padding: 0 12px 10px;
+}
+
+.builder-section-thumb {
+  border: 1px solid #e8e8ec; border-radius: 8px;
+  overflow: hidden; cursor: pointer;
+  transition: all 0.18s; background: #fff;
+}
+.builder-section-thumb:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.12);
+  transform: translateY(-1px);
+}
+
+.builder-section-thumb-preview {
+  height: 48px; background: #f9f9fb;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid #f0f0f3;
+  overflow: hidden; padding: 6px;
+}
+
+.builder-section-thumb-label {
+  padding: 5px 6px;
+  font-size: 10px; font-weight: 500;
+  color: #374151; text-align: center;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Center Canvas ──────────────────────────────────── */
+.builder-canvas {
+  flex: 1; min-width: 0;
+  background: #e8e8ec;
+  display: flex; align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.builder-canvas-frame {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+/* ── Right Inspector Panel (~280px) ──────────────────── */
+.builder-right-panel {
+  width: 280px; flex-shrink: 0;
+  background: #fff; border-left: 1px solid #e2e2e5;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.builder-right-tabs {
+  display: flex; padding: 0 8px;
+  border-bottom: 1px solid #e2e2e5;
+  flex-shrink: 0;
+}
+.builder-right-tab {
+  flex: 1; padding: 11px 0;
+  border: none; background: transparent;
+  cursor: pointer; color: #9ca3af;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.builder-right-tab:hover { color: #6b7280; background: #fafafa; }
+.builder-right-tab.active {
+  color: #111;
+  border-bottom-color: #111;
+}
+
+/* Inspector sections */
+.builder-inspector-section {
+  border-bottom: 1px solid #f0f0f3;
+}
+
+.builder-inspector-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  cursor: pointer; user-select: none;
+}
+.builder-inspector-header:hover { background: #fafafa; }
+
+.builder-inspector-label {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  color: #6b7280;
+}
+
+.builder-inspector-body {
+  padding: 0 14px 14px;
+}
+
+/* Empty state */
+.builder-empty-state {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px; color: #9ca3af;
+  padding: 40px 24px; text-align: center;
+}
+
+/* ── Toast notification ──────────────────────────────── */
+.builder-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 500;
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  background: #111; color: #fff;
+  border-radius: 8px;
+  font-size: 12.5px; font-weight: 500;
+  font-family: var(--font);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  animation: builder-toast-in 0.25s ease-out;
+  pointer-events: none;
+}
+@keyframes builder-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── Scrollbar styling (builder panels) ──────────────── */
+.builder-left-panel ::-webkit-scrollbar,
+.builder-right-panel ::-webkit-scrollbar,
+.builder-canvas::-webkit-scrollbar {
+  width: 6px;
+}
+.builder-left-panel ::-webkit-scrollbar-track,
+.builder-right-panel ::-webkit-scrollbar-track,
+.builder-canvas::-webkit-scrollbar-track {
+  background: transparent;
+}
+.builder-left-panel ::-webkit-scrollbar-thumb,
+.builder-right-panel ::-webkit-scrollbar-thumb,
+.builder-canvas::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+.builder-left-panel ::-webkit-scrollbar-thumb:hover,
+.builder-right-panel ::-webkit-scrollbar-thumb:hover,
+.builder-canvas::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* ── Inline editing — section selection ───────────────── */
+.builder-section-wrapper {
+  position: relative;
+  cursor: default;
+  transition: outline 0.15s ease;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+.builder-section-wrapper:hover {
+  outline: 2px dashed rgba(0, 106, 255, 0.2);
+}
+.builder-section-wrapper.builder-section-selected {
+  outline: 2px solid rgba(0, 106, 255, 0.5);
+}
+.builder-section-wrapper.builder-section-selected:hover {
+  outline: 2px solid rgba(0, 106, 255, 0.5);
+}
+.builder-section-label {
+  position: absolute;
+  top: 0; left: 0; z-index: 10;
+  padding: 2px 8px;
+  background: #006AFF;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 0 0 6px 0;
+  pointer-events: none;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+/* ── Settings modal tab hover ────────────────────────── */
+.builder-settings-tab {
+  padding: 8px 16px; font-size: 12px;
+  border: none; background: transparent;
+  cursor: pointer; font-family: var(--font);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+  border-radius: 0;
+}
+.builder-settings-tab:hover {
+  background: #f5f5f7;
+  color: var(--text-primary);
+}
+.builder-settings-tab.active {
+  font-weight: 600;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}

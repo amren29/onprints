@@ -1,0 +1,17 @@
+{
+  "name": "onprints",
+  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2024-09-23",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "main": ".open-next/worker.js",
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://caxlivkovmvglmqftajl.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNheGxpdmtvdm12Z2xtcWZ0YWpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NTgxOTUsImV4cCI6MjA4OTEzNDE5NX0.KQCy9kYZmynin1dyRVaTvwQCb4iGCeeZoHwxQG2EIAQ",
+    "NEXT_PUBLIC_SITE_URL": "https://onprints.mohamedamrin07.workers.dev",
+    "NEXT_PUBLIC_SHOP_ID": "f5560071-02c2-40a3-a1d0-22d05cd94833",
+    "NODE_VERSION": "20"
+  }
+}
