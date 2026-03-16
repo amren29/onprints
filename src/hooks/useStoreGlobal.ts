@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { type GlobalSettings, DEFAULT_GLOBAL } from '@/lib/store-builder'
-import { getStorePage } from '@/lib/db/storefront'
-
-const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID!
 
 export function useStoreGlobal(): GlobalSettings {
   const [settings, setSettings] = useState<GlobalSettings>(DEFAULT_GLOBAL)
@@ -13,8 +10,8 @@ export function useStoreGlobal(): GlobalSettings {
     let cancelled = false
     async function load() {
       try {
-        // Fetch any page — globals are the same across all pages for this shop
-        const page = await getStorePage(SHOP_ID, 'homepage')
+        const res = await fetch('/api/store/pages?pageId=homepage')
+        const { page } = await res.json()
         if (!cancelled && page?.globals) {
           setSettings({ ...DEFAULT_GLOBAL, ...(page.globals as Partial<GlobalSettings>) })
         }
