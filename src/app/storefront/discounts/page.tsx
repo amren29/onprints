@@ -63,6 +63,10 @@ export default function DiscountsPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteDiscount(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['discounts', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteDiscount]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   /* ── Filtering ── */

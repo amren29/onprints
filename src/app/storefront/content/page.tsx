@@ -54,6 +54,10 @@ export default function ContentPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteContentPage(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['content-pages', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteContentPage]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   /* ── Filtering ── */

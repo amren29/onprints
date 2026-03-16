@@ -39,6 +39,10 @@ export default function NewDiscountPage() {
       qc.invalidateQueries({ queryKey: ['discounts', shopId] })
       router.push('/storefront/discounts?created=1')
     },
+    onError: (err: any) => {
+      console.error('[createDiscount]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleCreate = () => {

@@ -159,12 +159,21 @@ export default function CatalogDetailPage({ params }: { params: Promise<{ id: st
       qc.invalidateQueries({ queryKey: ['product', shopId, id] })
       router.push('/catalog?saved=1')
     },
+    onError: (err: any) => {
+      console.error('[updateProduct]', err)
+      setSaving(false)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
   const deleteMut = useMutation({
     mutationFn: () => deleteProduct(shopId, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['products', shopId] })
       router.push('/catalog')
+    },
+    onError: (err: any) => {
+      console.error('[deleteProduct]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
     },
   })
 

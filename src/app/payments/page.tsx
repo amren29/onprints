@@ -70,11 +70,19 @@ export default function PaymentsPage() {
     mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updatePayment>[2] }) =>
       updatePayment(shopId, id, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['payments', shopId] }),
+    onError: (err: any) => {
+      console.error('[updatePayment]', err)
+      alert('Failed to update: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => deletePayment(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['payments', shopId] }),
+    onError: (err: any) => {
+      console.error('[deletePayment]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const [tab, setTab] = useState('All')

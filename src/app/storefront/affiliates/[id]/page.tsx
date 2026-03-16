@@ -102,6 +102,10 @@ export default function AffiliateDetailPage() {
       qc.invalidateQueries({ queryKey: ['affiliates', shopId] })
       router.push('/storefront/affiliates?saved=1')
     },
+    onError: (err: any) => {
+      console.error('[updateAffiliate]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMut = useMutation({
@@ -109,6 +113,10 @@ export default function AffiliateDetailPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['affiliates', shopId] })
       router.push('/storefront/affiliates')
+    },
+    onError: (err: any) => {
+      console.error('[deleteAffiliate]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
     },
   })
 

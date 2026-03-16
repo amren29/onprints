@@ -111,26 +111,47 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
   const updateMutation = useMutation({
     mutationFn: (updates: Parameters<typeof updateAgent>[2]) => updateAgent(shopId, id, updates),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['agents', shopId] }); router.push('/agents?saved=1') },
+    onError: (err: any) => {
+      console.error('[updateAgent]', err)
+      setSaving(false)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteAgent(shopId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['agents', shopId] }); router.push('/agents') },
+    onError: (err: any) => {
+      console.error('[deleteAgent]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const topupUpdateMutation = useMutation({
     mutationFn: ({ tId, updates }: { tId: string; updates: Parameters<typeof updateTopupRequest>[2] }) => updateTopupRequest(shopId, tId, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['topup-requests', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateTopupRequest]', err)
+      alert('Failed to update topup: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const topupDeleteMutation = useMutation({
     mutationFn: (tId: string) => deleteTopupRequest(shopId, tId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['topup-requests', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteTopupRequest]', err)
+      alert('Failed to delete topup: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const topupCreateMutation = useMutation({
     mutationFn: (input: Parameters<typeof createTopupRequest>[1]) => createTopupRequest(shopId, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['topup-requests', shopId] }),
+    onError: (err: any) => {
+      console.error('[createTopupRequest]', err)
+      alert('Failed to create topup: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   if (isLoading) {

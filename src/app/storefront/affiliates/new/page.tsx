@@ -46,6 +46,10 @@ export default function NewAffiliatePage() {
       qc.invalidateQueries({ queryKey: ['affiliates', shopId] })
       router.push('/storefront/affiliates?created=1')
     },
+    onError: (err: any) => {
+      console.error('[createAffiliate]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const toggleProduct = (id: string) => {

@@ -60,6 +60,10 @@ export default function EditDiscountPage() {
       qc.invalidateQueries({ queryKey: ['discounts', shopId] })
       router.push('/storefront/discounts?saved=1')
     },
+    onError: (err: any) => {
+      console.error('[updateDiscount]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   if (!isLoading && !disc) {

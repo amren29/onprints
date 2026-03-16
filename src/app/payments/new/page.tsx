@@ -31,6 +31,11 @@ export default function NewPaymentPage() {
   const createMut = useMutation({
     mutationFn: (data: Parameters<typeof createPayment>[1]) => createPayment(shopId, data),
     onSuccess: () => router.push('/payments?created=1'),
+    onError: (err: any) => {
+      console.error('[createPayment]', err)
+      setSaving(false)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const [saving, setSaving] = useState(false)

@@ -39,6 +39,10 @@ export default function NewCampaignPage() {
       qc.invalidateQueries({ queryKey: ['campaigns', shopId] })
       router.push('/storefront/marketing?created=1')
     },
+    onError: (err: any) => {
+      console.error('[createCampaign]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleCreate = () => {

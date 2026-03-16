@@ -59,6 +59,10 @@ export default function StoreOrdersPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteOrder(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['orders', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteOrder]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const filtered = allOrders.filter(o => {

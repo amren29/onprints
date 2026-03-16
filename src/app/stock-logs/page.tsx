@@ -85,11 +85,19 @@ export default function StockLogsPage() {
       qc.invalidateQueries({ queryKey: ['stock-logs', shopId] })
       qc.invalidateQueries({ queryKey: ['stock-items', shopId] })
     },
+    onError: (err: any) => {
+      console.error('[createStockLog]', err)
+      alert('Failed to create: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteStockLog(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['stock-logs', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteStockLog]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   /* ── Filtering ─────────────────────────────────────── */

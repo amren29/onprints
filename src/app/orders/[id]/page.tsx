@@ -111,16 +111,29 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       qc.invalidateQueries({ queryKey: ['order', shopId, id] })
       qc.invalidateQueries({ queryKey: ['orders', shopId] })
     },
+    onError: (err: any) => {
+      console.error('[updateOrder]', err)
+      setSaving(false)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMut = useMutation({
     mutationFn: () => dbDeleteOrder(shopId, id),
     onSuccess: () => router.push('/orders'),
+    onError: (err: any) => {
+      console.error('[deleteOrder]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const dupMut = useMutation({
     mutationFn: () => dbDuplicateOrder(shopId, id),
     onSuccess: (newOrder) => { if (newOrder) router.push(`/orders/${newOrder.id}`) },
+    onError: (err: any) => {
+      console.error('[duplicateOrder]', err)
+      alert('Failed to duplicate: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   // Local state initialized from server data

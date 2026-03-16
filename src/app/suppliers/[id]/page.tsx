@@ -57,11 +57,20 @@ export default function SupplierDetailPage({ params }: { params: Promise<{ id: s
   const updateMutation = useMutation({
     mutationFn: (updates: Parameters<typeof updateSupplier>[2]) => updateSupplier(shopId, id, updates),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['suppliers', shopId] }); router.push('/suppliers?saved=1') },
+    onError: (err: any) => {
+      console.error('[updateSupplier]', err)
+      setSaving(false)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteSupplier(shopId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['suppliers', shopId] }); router.push('/suppliers') },
+    onError: (err: any) => {
+      console.error('[deleteSupplier]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   if (isLoading) {

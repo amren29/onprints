@@ -74,16 +74,28 @@ export default function AffiliatesPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteAffiliate(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['affiliates', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteAffiliate]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const updateMut = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updateAffiliate>[2] }) => updateAffiliate(shopId, id, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['affiliates', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateAffiliate]', err)
+      alert('Failed to update: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const updatePayoutMut = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updatePayoutRequest>[2] }) => updatePayoutRequest(shopId, id, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['payout-requests', shopId] }),
+    onError: (err: any) => {
+      console.error('[updatePayoutRequest]', err)
+      alert('Failed to update payout: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   /* ── Affiliates view state ── */

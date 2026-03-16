@@ -56,6 +56,10 @@ export default function AbandonedCartsPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteAbandonedCart(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['abandoned-carts', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteAbandonedCart]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const filtered = useMemo(() => {

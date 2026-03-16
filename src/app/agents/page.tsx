@@ -110,11 +110,19 @@ export default function AgentsPage() {
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => updateAgent(shopId, id, { status }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['agents', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateAgentStatus]', err)
+      alert('Failed to update status: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteAgent(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['agents', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteAgent]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleStatusChange = (a: DbAgent, newStatus: string) => {

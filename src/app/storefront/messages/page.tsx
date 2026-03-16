@@ -97,6 +97,10 @@ export default function MessagesPage() {
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     },
+    onError: (err: any) => {
+      console.error('[saveMessageTemplate]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   // Build display list using TEMPLATE_KEYS as source, merge with DB data

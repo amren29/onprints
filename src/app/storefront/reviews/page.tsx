@@ -60,11 +60,19 @@ export default function ReviewsPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteReview(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['reviews', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteReview]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const updateMut = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updateReview>[2] }) => updateReview(shopId, id, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['reviews', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateReview]', err)
+      alert('Failed to update: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const visible = rows.filter(r => {

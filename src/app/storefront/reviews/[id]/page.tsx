@@ -59,6 +59,10 @@ export default function EditReviewPage() {
       qc.invalidateQueries({ queryKey: ['reviews', shopId] })
       router.push('/storefront/reviews?saved=1')
     },
+    onError: (err: any) => {
+      console.error('[updateReview]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleSave = () => {

@@ -62,6 +62,10 @@ export default function MarketingPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteCampaign(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['campaigns', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteCampaign]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   /* ── Filtering ── */

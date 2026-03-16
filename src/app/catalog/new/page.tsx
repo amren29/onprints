@@ -174,6 +174,11 @@ export default function NewCatalogPage() {
       qc.invalidateQueries({ queryKey: ['products', shopId] })
       router.push('/catalog?created=1')
     },
+    onError: (err: any) => {
+      console.error('[createProduct]', err)
+      setSaving(false)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   // ── Option group helpers ──────────────────────────────────────────────

@@ -62,6 +62,10 @@ export default function EditBundlePage() {
       qc.invalidateQueries({ queryKey: ['bundles', shopId] })
       router.push('/storefront/bundles?saved=1')
     },
+    onError: (err: any) => {
+      console.error('[updateBundle]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleSave = () => {

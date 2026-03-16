@@ -57,6 +57,10 @@ export default function EditContentPage() {
       qc.invalidateQueries({ queryKey: ['content-pages', shopId] })
       router.push('/storefront/content?saved=1')
     },
+    onError: (err: any) => {
+      console.error('[updateContentPage]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   if (!isLoading && !item) {

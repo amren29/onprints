@@ -65,11 +65,19 @@ export default function OrdersPage() {
     mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updateOrder>[2] }) =>
       updateOrder(shopId, id, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['orders', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateOrder]', err)
+      alert('Failed to update: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteOrder(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['orders', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteOrder]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleStatusChange = (o: DbOrder, newStatus: string) => {

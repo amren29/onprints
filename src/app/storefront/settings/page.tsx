@@ -153,6 +153,10 @@ export default function StoreSettingsPage() {
   const saveMut = useMutation({
     mutationFn: (config: Record<string, unknown>) => saveStoreSettings(shopId, config),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['store-settings', shopId] }),
+    onError: (err: any) => {
+      console.error('[saveStoreSettings]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   useEffect(() => {

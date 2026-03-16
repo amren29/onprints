@@ -75,6 +75,10 @@ export default function CatalogPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteProduct(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['products', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteProduct]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const filtered = items.filter(c => {

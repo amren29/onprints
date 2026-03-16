@@ -56,11 +56,19 @@ export default function BundlesPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteBundle(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['bundles', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteBundle]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const featureMut = useMutation({
     mutationFn: ({ id, featured }: { id: string; featured: boolean }) => updateBundle(shopId, id, { featured }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['bundles', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateBundle]', err)
+      alert('Failed to update: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const visible = rows.filter(b => {

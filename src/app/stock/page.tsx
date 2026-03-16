@@ -72,6 +72,10 @@ export default function StockPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteStockItem(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['stock-items', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteStockItem]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const filtered = items.filter(s => {

@@ -61,6 +61,10 @@ export default function EditCampaignPage() {
       qc.invalidateQueries({ queryKey: ['campaigns', shopId] })
       router.push('/storefront/marketing?saved=1')
     },
+    onError: (err: any) => {
+      console.error('[updateCampaign]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   if (!isLoading && !campaign) {

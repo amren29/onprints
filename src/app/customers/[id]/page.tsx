@@ -134,6 +134,10 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       qc.invalidateQueries({ queryKey: ['customers', shopId] })
       router.push('/customers')
     },
+    onError: (err: any) => {
+      console.error('[deleteCustomer]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   if (isLoading) {

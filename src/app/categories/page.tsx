@@ -149,15 +149,27 @@ export default function CategoriesPage() {
     mutationFn: (data: { name: string; status: string; visibility: string; notes: string }) =>
       dbCreateCategory(shopId, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['categories', shopId] }),
+    onError: (err: any) => {
+      console.error('[createCategory]', err)
+      alert('Failed to create: ' + (err?.message || 'Unknown error'))
+    },
   })
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<{ name: string; status: string; visibility: string; notes: string }> }) =>
       dbUpdateCategory(shopId, id, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['categories', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateCategory]', err)
+      alert('Failed to update: ' + (err?.message || 'Unknown error'))
+    },
   })
   const deleteMut = useMutation({
     mutationFn: (id: string) => dbDeleteCategory(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['categories', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteCategory]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const itemCount = (catId: string) => products.filter(p => p.category_id === catId).length

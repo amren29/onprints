@@ -54,16 +54,28 @@ export default function MembershipPage() {
   const createMut = useMutation({
     mutationFn: (data: Parameters<typeof createMembership>[1]) => createMembership(shopId, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['memberships', shopId] }),
+    onError: (err: any) => {
+      console.error('[createMembership]', err)
+      alert('Failed to create: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const updateMut = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updateMembership>[2] }) => updateMembership(shopId, id, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['memberships', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateMembership]', err)
+      alert('Failed to update: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteMembership(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['memberships', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteMembership]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const openAdd = () => {

@@ -116,11 +116,19 @@ export default function CustomersPage() {
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       updateCustomer(shopId, id, { status }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['customers', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateCustomerStatus]', err)
+      alert('Failed to update status: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteCustomer(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['customers', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteCustomer]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleStatusChange = (c: DbCustomer, newStatus: string) => {

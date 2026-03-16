@@ -165,6 +165,11 @@ export default function NewOrderPage() {
   const createMut = useMutation({
     mutationFn: (data: Parameters<typeof dbCreateOrder>[1]) => dbCreateOrder(shopId, data),
     onSuccess: () => router.push('/orders?created=1'),
+    onError: (err: any) => {
+      console.error('[createOrder]', err)
+      setSaving(false)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const [saving,   setSaving]   = useState(false)

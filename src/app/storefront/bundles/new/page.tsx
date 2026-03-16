@@ -42,6 +42,10 @@ export default function NewBundlePage() {
       qc.invalidateQueries({ queryKey: ['bundles', shopId] })
       router.push('/storefront/bundles?created=1')
     },
+    onError: (err: any) => {
+      console.error('[createBundle]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleCreate = () => {

@@ -54,6 +54,10 @@ export default function OrdersKanbanPage() {
     mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updateOrder>[2] }) =>
       updateOrder(shopId, id, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['orders', shopId] }),
+    onError: (err: any) => {
+      console.error('[updateOrder]', err)
+      alert('Failed to update: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const [filterStatus, setFilterStatus] = useState<'All' | 'manual' | 'online-store'>('All')

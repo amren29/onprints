@@ -66,11 +66,20 @@ export default function StockDetailPage({ params }: { params: Promise<{ id: stri
   const updateMutation = useMutation({
     mutationFn: (updates: Parameters<typeof updateStockItem>[2]) => updateStockItem(shopId, id, updates),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['stock-items', shopId] }); router.push('/stock?saved=1') },
+    onError: (err: any) => {
+      console.error('[updateStockItem]', err)
+      setSaving(false)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteStockItem(shopId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['stock-items', shopId] }); router.push('/stock') },
+    onError: (err: any) => {
+      console.error('[deleteStockItem]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   if (isLoading) {

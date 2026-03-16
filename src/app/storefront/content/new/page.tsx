@@ -45,6 +45,10 @@ export default function NewContentPage() {
       qc.invalidateQueries({ queryKey: ['content-pages', shopId] })
       router.push('/storefront/content?created=1')
     },
+    onError: (err: any) => {
+      console.error('[createContentPage]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const handleCreate = () => {

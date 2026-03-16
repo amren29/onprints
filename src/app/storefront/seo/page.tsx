@@ -78,6 +78,10 @@ export default function SeoPage() {
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     },
+    onError: (err: any) => {
+      console.error('[saveStoreSettings]', err)
+      alert('Failed to save: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   if (!settingsRow && !hydrated) return <MyStoreShell><div style={{ padding: 40 }}>Loading...</div></MyStoreShell>

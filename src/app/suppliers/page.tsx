@@ -65,6 +65,10 @@ export default function SuppliersPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteSupplier(shopId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['suppliers', shopId] }),
+    onError: (err: any) => {
+      console.error('[deleteSupplier]', err)
+      alert('Failed to delete: ' + (err?.message || 'Unknown error'))
+    },
   })
 
   const filtered = suppliers.filter(s => {
