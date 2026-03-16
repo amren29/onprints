@@ -185,21 +185,10 @@ export async function getStoreProducts(): Promise<Product[]> {
     getCategories(SHOP_ID),
   ])
 
-  // Also load product map from store page to check enabled products
-  let enabledMap: Record<string, boolean> = {}
-  try {
-    const page = await getStorePage(SHOP_ID, 'homepage')
-    // The product map is stored separately, but for now treat all published/active as enabled
-    // TODO: If product map is stored in store_pages or elsewhere, load it here
-  } catch { /* ignore */ }
-
   const catMap = new Map(categories.map(c => [c.id, c.name]))
 
   return products
-    .filter(item => {
-      if (enabledMap[item.id] !== undefined) return enabledMap[item.id]
-      return item.status === 'Active' && item.visibility === 'published'
-    })
+    .filter(item => item.status === 'Active' && item.visibility === 'published')
     .map(item => dbProductToProduct(item, catMap.get(item.category_id ?? '') ?? ''))
 }
 

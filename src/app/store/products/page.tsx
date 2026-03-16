@@ -32,8 +32,8 @@ export default function ProductsPage() {
           setAllProducts(prods)
           setCategories(cats)
         }
-      } catch {
-        // keep empty on error
+      } catch (err) {
+        console.error('[Store Products] Failed to load:', err)
       } finally {
         if (!cancelled) setLoading(false)
       }
