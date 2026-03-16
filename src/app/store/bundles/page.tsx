@@ -6,13 +6,10 @@ import Navbar from '@/components/store/Navbar'
 import Footer from '@/components/store/Footer'
 import { SectionRenderer } from '@/components/store/sections'
 import { type PageSection, DEFAULT_PAGE_SECTIONS } from '@/lib/store-builder'
-import { getBundles, type DbBundle } from '@/lib/db/bundles'
-import { getProducts, type DbProduct } from '@/lib/db/catalog'
-import { getStorePage } from '@/lib/db/storefront'
+import { type DbBundle } from '@/lib/db/bundles'
+import { type DbProduct } from '@/lib/db/catalog'
 import { useCartStore } from '@/lib/store/cart-store'
 import { formatMYR } from '@/lib/store/pricing-engine'
-
-const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID!
 
 export default function BundlesPage() {
   const [sections, setSections] = useState<PageSection[]>([])
@@ -25,15 +22,16 @@ export default function BundlesPage() {
     let cancelled = false
     async function load() {
       try {
-        const [page, dbBundles, prods] = await Promise.all([
-          getStorePage(SHOP_ID, 'bundles'),
-          getBundles(SHOP_ID),
-          getProducts(SHOP_ID),
+        const [pageRes, bundlesRes] = await Promise.all([
+          fetch('/api/store/pages?pageId=bundles'),
+          fetch('/api/store/bundles'),
         ])
+        const { page } = await pageRes.json()
+        const { bundles: dbBundles, products: prods } = await bundlesRes.json()
         if (!cancelled) {
           setSections((page?.sections as PageSection[]) ?? DEFAULT_PAGE_SECTIONS.bundles())
-          setBundles(dbBundles.filter((b) => b.status === 'Active'))
-          setCatalogProducts(prods)
+          setBundles((dbBundles ?? []).filter((b: DbBundle) => b.status === 'Active'))
+          setCatalogProducts(prods ?? [])
         }
       } catch {
         if (!cancelled) setSections(DEFAULT_PAGE_SECTIONS.bundles())

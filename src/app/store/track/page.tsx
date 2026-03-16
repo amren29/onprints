@@ -7,11 +7,7 @@ import Footer from '@/components/store/Footer'
 import NewsletterCTA from '@/components/store/NewsletterCTA'
 import { SectionRenderer } from '@/components/store/sections'
 import { type PageSection, DEFAULT_PAGE_SECTIONS } from '@/lib/store-builder'
-import { getStorePage } from '@/lib/db/storefront'
-import { getOrderById } from '@/lib/db/orders'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
-
-const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID!
 
 type TrackStatus = 'received' | 'production' | 'quality' | 'shipped'
 
@@ -54,7 +50,8 @@ function TrackContent() {
     let cancelled = false
     async function load() {
       try {
-        const page = await getStorePage(SHOP_ID, 'track')
+        const res = await fetch('/api/store/pages?pageId=track')
+        const { page } = await res.json()
         if (!cancelled) {
           setSections((page?.sections as PageSection[]) ?? DEFAULT_PAGE_SECTIONS.track())
         }
@@ -75,7 +72,8 @@ function TrackContent() {
   async function doSearch(id: string) {
     setSearching(true)
     try {
-      const order = await getOrderById(SHOP_ID, id.trim().toUpperCase())
+      const res = await fetch(`/api/store/track?orderId=${encodeURIComponent(id.trim().toUpperCase())}`)
+      const { order } = await res.json()
       setSearched(true)
       if (order) {
         const step = mapProductionToStep(order.production, order.status)

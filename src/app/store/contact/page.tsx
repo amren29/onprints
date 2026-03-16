@@ -5,9 +5,6 @@ import Navbar from '@/components/store/Navbar'
 import Footer from '@/components/store/Footer'
 import { PageRenderer } from '@/components/store/sections'
 import { type PageSection, DEFAULT_PAGE_SECTIONS } from '@/lib/store-builder'
-import { getStorePage } from '@/lib/db/storefront'
-
-const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID!
 
 export default function ContactPage() {
   const [sections, setSections] = useState<PageSection[]>([])
@@ -16,7 +13,8 @@ export default function ContactPage() {
     let cancelled = false
     async function load() {
       try {
-        const page = await getStorePage(SHOP_ID, 'contact')
+        const res = await fetch('/api/store/pages?pageId=contact')
+        const { page } = await res.json()
         if (!cancelled) {
           setSections((page?.sections as PageSection[]) ?? DEFAULT_PAGE_SECTIONS.contact())
         }

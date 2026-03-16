@@ -180,14 +180,22 @@ export function dbProductToProduct(item: DbProduct, categoryName: string): Produ
 
 /* ── Get all store products from Supabase ────── */
 export async function getStoreProducts(): Promise<Product[]> {
-  const [products, categories] = await Promise.all([
-    getProducts(SHOP_ID),
-    getCategories(SHOP_ID),
-  ])
+  // Use API route instead of server actions (compatible with Cloudflare Workers)
+  const baseUrl = typeof window !== 'undefined'
+    ? ''
+    : (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000')
 
-  const catMap = new Map(categories.map(c => [c.id, c.name]))
+  const res = await fetch(`${baseUrl}/api/store/products`, { cache: 'no-store' })
+  if (!res.ok) return []
 
-  return products
+  const { products, categories } = await res.json() as {
+    products: DbProduct[]
+    categories: DbCategory[]
+  }
+
+  const catMap = new Map((categories || []).map((c: DbCategory) => [c.id, c.name]))
+
+  return (products || [])
     .filter(item => item.status === 'Active' && item.visibility === 'published')
     .map(item => dbProductToProduct(item, catMap.get(item.category_id ?? '') ?? ''))
 }
