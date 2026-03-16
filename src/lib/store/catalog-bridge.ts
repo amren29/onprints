@@ -2,11 +2,8 @@
  * Bridge between admin DbProduct (Supabase) and store Product type.
  * Converts DB products into the Product shape the online store expects.
  */
-import { getProducts, getCategories, type DbProduct, type DbCategory } from '@/lib/db/catalog'
-import { getStorePage } from '@/lib/db/storefront'
+import { type DbProduct, type DbCategory } from '@/lib/db/catalog'
 import type { Product, ProductCategory, SpecOption, PricingMatrix } from '@/types/store'
-
-const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID!
 
 /* ── Category mapping ─────────────────────────────── */
 const CATEGORY_MAP: Record<string, ProductCategory> = {
