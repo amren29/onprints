@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 
 export async function signUp(formData: {
@@ -80,6 +81,25 @@ export async function updatePassword(newPassword: string) {
     return { error: error.message }
   }
 
+  return { error: null }
+}
+
+export async function deleteAccount() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Not authenticated' }
+
+  // Remove shop membership
+  await supabaseAdmin.from('shop_members').delete().eq('user_id', user.id)
+
+  // Delete the auth user
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(user.id)
+
+  if (error) return { error: error.message }
+
+  // Sign out
+  await supabase.auth.signOut()
   return { error: null }
 }
 

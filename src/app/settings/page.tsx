@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import AppShell from '@/components/AppShell'
 import RowMenu from '@/components/RowMenu'
 import CustomSelect from '@/components/CustomSelect'
@@ -429,6 +430,10 @@ function AccountSection({ onSave }: { onSave: (msg: string) => void }) {
   const [name, setName]   = useState('Ahmad Zawawi')
   const [email, setEmail] = useState('ahmad@saasprint.my')
   const [phone, setPhone] = useState('+60 12-388 4411')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteText, setDeleteText] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const router = useRouter()
 
   return (
     <div>
@@ -502,13 +507,65 @@ function AccountSection({ onSave }: { onSave: (msg: string) => void }) {
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--negative)' }}>Danger Zone</span>
           </div>
           <div style={{ fontSize: 12.5, color: 'var(--negative)', marginBottom: 16, opacity: 0.7 }}>These actions are irreversible. Please be careful.</div>
-          <button style={{
-            fontSize: 12.5, fontWeight: 600, color: '#fff', border: 'none',
-            background: 'var(--negative)', padding: '8px 16px', borderRadius: 8,
-            cursor: 'pointer', fontFamily: 'var(--font)', transition: 'opacity 0.15s ease',
-          }}>
-            Delete My Account
-          </button>
+
+          {!showDeleteConfirm ? (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              style={{
+                fontSize: 12.5, fontWeight: 600, color: '#fff', border: 'none',
+                background: 'var(--negative)', padding: '8px 16px', borderRadius: 8,
+                cursor: 'pointer', fontFamily: 'var(--font)', transition: 'opacity 0.15s ease',
+              }}
+            >
+              Delete My Account
+            </button>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ fontSize: 12.5, color: 'var(--negative)', fontWeight: 600 }}>
+                Type <strong>DELETE</strong> to confirm:
+              </div>
+              <input
+                className="form-input"
+                value={deleteText}
+                onChange={e => setDeleteText(e.target.value)}
+                placeholder="Type DELETE"
+                style={{ padding: '8px 12px', maxWidth: 240, borderColor: '#fecaca' }}
+                autoFocus
+              />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  disabled={deleteText !== 'DELETE' || deleting}
+                  onClick={async () => {
+                    setDeleting(true)
+                    const { deleteAccount } = await import('@/lib/auth-actions')
+                    const result = await deleteAccount()
+                    if (result.error) {
+                      alert(result.error)
+                      setDeleting(false)
+                      return
+                    }
+                    router.push('/login')
+                  }}
+                  style={{
+                    fontSize: 12.5, fontWeight: 600, color: '#fff', border: 'none',
+                    background: deleteText === 'DELETE' ? 'var(--negative)' : '#ccc',
+                    padding: '8px 16px', borderRadius: 8,
+                    cursor: deleteText === 'DELETE' && !deleting ? 'pointer' : 'not-allowed',
+                    fontFamily: 'var(--font)', opacity: deleting ? 0.6 : 1,
+                  }}
+                >
+                  {deleting ? 'Deleting...' : 'Confirm Delete'}
+                </button>
+                <button
+                  onClick={() => { setShowDeleteConfirm(false); setDeleteText('') }}
+                  className="btn-secondary"
+                  style={{ fontSize: 12.5, padding: '8px 16px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
