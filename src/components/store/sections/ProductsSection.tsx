@@ -6,6 +6,7 @@ import type { PageSection } from '@/lib/store-builder'
 import AnimateIn from '@/components/store/AnimateIn'
 import CategoryIcon from '@/components/store/CategoryIcon'
 import { getStoreProducts } from '@/lib/store/catalog-bridge'
+import { useStore } from '@/providers/store-context'
 import type { Product } from '@/types/store'
 import EditableText, { type SectionEditCtx } from './EditableText'
 
@@ -20,6 +21,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 export default function ProductsSection({ section, editMode, sectionId, onEdit }: { section: PageSection } & SectionEditCtx) {
   const { title, maxItems } = section.props
+  const { basePath } = useStore()
   const [products, setProducts] = useState<Product[]>([])
   useEffect(() => { getStoreProducts().then(prods => setProducts(prods.slice(0, maxItems || 20))).catch(() => {}) }, [maxItems])
   const ep = { editMode, sectionId, onEdit }
@@ -30,7 +32,7 @@ export default function ProductsSection({ section, editMode, sectionId, onEdit }
         <AnimateIn>
           <div className="flex items-center gap-4 mb-8">
             <EditableText value={title || 'Popular Products'} propPath="title" tag="h2" className="text-2xl font-bold text-gray-900" {...ep} />
-            <Link href="/store/products" className="text-sm text-gray-500 hover:text-accent font-medium flex items-center gap-1 transition">
+            <Link href={`${basePath}/products`} className="text-sm text-gray-500 hover:text-accent font-medium flex items-center gap-1 transition">
               See all products
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
             </Link>
@@ -41,7 +43,7 @@ export default function ProductsSection({ section, editMode, sectionId, onEdit }
             const img = product.imageUrl || CATEGORY_IMAGES[product.category]
             return (
               <AnimateIn key={product.id} delay={i * 80} animation="fade-up">
-                <Link href={`/store/products/${product.slug}`} className="group">
+                <Link href={`${basePath}/products/${product.slug}`} className="group">
                   <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 mb-3">
                     {img ? (
                       <img src={img} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -65,7 +67,7 @@ export default function ProductsSection({ section, editMode, sectionId, onEdit }
         </div>
         {products.length > 0 && (
           <div className="flex justify-center mt-10">
-            <Link href="/store/products" className="inline-flex items-center gap-2 border-2 border-gray-900 text-gray-900 font-bold px-8 py-3 rounded-lg hover:bg-gray-900 hover:text-white transition text-sm">
+            <Link href={`${basePath}/products`} className="inline-flex items-center gap-2 border-2 border-gray-900 text-gray-900 font-bold px-8 py-3 rounded-lg hover:bg-gray-900 hover:text-white transition text-sm">
               See more
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </Link>

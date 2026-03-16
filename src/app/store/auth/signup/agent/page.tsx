@@ -12,6 +12,7 @@ import { useAuthStore } from '@/lib/store/auth-store'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
 import { upsertOnlineCustomer } from '@/lib/store/customer-bridge'
 import { createAgent as dbCreateAgent } from '@/lib/db/agents'
+import { useStore } from '@/providers/store-context'
 
 const BUSINESS_TYPES = [
   'Sole Proprietorship',
@@ -47,6 +48,7 @@ export default function AgentSignUpPage() {
   const signUp = useAuthStore((s) => s.signUp)
   const currentUser = useAuthStore((s) => s.currentUser)
   const globalSettings = useStoreGlobal()
+  const { basePath } = useStore()
 
   // Personal
   const [name, setName] = useState('')
@@ -67,7 +69,7 @@ export default function AgentSignUpPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (currentUser) router.replace('/store/account')
+    if (currentUser) router.replace(`${basePath}/account`)
   }, [currentUser, router])
 
   const validate = () => {
@@ -125,7 +127,7 @@ export default function AgentSignUpPage() {
           }).catch(() => {})
         }
 
-        router.push('/store/account')
+        router.push(`${basePath}/account`)
       } else {
         setGlobalError(result.error || 'Sign up failed')
       }
@@ -291,7 +293,7 @@ export default function AgentSignUpPage() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{' '}
-            <Link href="/store/auth/signin" className="text-accent font-semibold hover:underline">
+            <Link href={`${basePath}/auth/signin`} className="text-accent font-semibold hover:underline">
               Sign in
             </Link>
           </p>

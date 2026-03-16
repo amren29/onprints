@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useCartStore } from '@/lib/store/cart-store'
 import { useAuthStore } from '@/lib/store/auth-store'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
+import { useStore } from '@/providers/store-context'
 import SearchBar from '@/components/store/navbar/SearchBar'
 import MobileMenu from '@/components/store/navbar/MobileMenu'
 
@@ -15,6 +16,7 @@ export default function Navbar() {
   const currentUser = useAuthStore((s) => s.currentUser)
   const signOut = useAuthStore((s) => s.signOut)
   const globalSettings = useStoreGlobal()
+  const { basePath } = useStore()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
@@ -73,24 +75,24 @@ export default function Navbar() {
           </button>
 
           {/* Logo */}
-          <Link href="/store" className="font-extrabold text-2xl text-accent tracking-tight shrink-0">
+          <Link href={basePath} className="font-extrabold text-2xl text-accent tracking-tight shrink-0">
             {globalSettings.shopName}
           </Link>
 
           {/* Nav menu — desktop (centered) */}
           <div className="hidden md:flex flex-1 items-center justify-center gap-1">
             {[
-              { href: '/store', label: 'Home' },
-              { href: '/store/about', label: 'About' },
-              { href: '/store/products', label: 'Products' },
-              { href: '/store/bundles', label: 'Bundles' },
-              { href: '/store/how-to-order', label: 'How to Order' },
-              { href: '/store/membership', label: 'Membership' },
-              { href: '/store/faq', label: 'FAQ' },
-              { href: '/store/track', label: 'Track Order' },
-              { href: '/store/contact', label: 'Contact Us' },
+              { href: basePath, label: 'Home' },
+              { href: `${basePath}/about`, label: 'About' },
+              { href: `${basePath}/products`, label: 'Products' },
+              { href: `${basePath}/bundles`, label: 'Bundles' },
+              { href: `${basePath}/how-to-order`, label: 'How to Order' },
+              { href: `${basePath}/membership`, label: 'Membership' },
+              { href: `${basePath}/faq`, label: 'FAQ' },
+              { href: `${basePath}/track`, label: 'Track Order' },
+              { href: `${basePath}/contact`, label: 'Contact Us' },
             ].map((link) => {
-              const isActive = pathname === link.href || (link.href !== '/store' && pathname.startsWith(link.href))
+              const isActive = pathname === link.href || (link.href !== basePath && pathname.startsWith(link.href))
               return (
                 <Link
                   key={link.href}
@@ -143,9 +145,9 @@ export default function Navbar() {
                     </div>
                     <div className="py-1">
                       {[
-                        { href: '/store/account', label: 'Dashboard' },
-                        { href: '/store/account/orders', label: 'My Orders' },
-                        { href: '/store/account/profile', label: 'Profile' },
+                        { href: `${basePath}/account`, label: 'Dashboard' },
+                        { href: `${basePath}/account/orders`, label: 'My Orders' },
+                        { href: `${basePath}/account/profile`, label: 'Profile' },
                       ].map((link) => (
                         <Link
                           key={link.href}
@@ -172,7 +174,7 @@ export default function Navbar() {
               </div>
             ) : (
               <Link
-                href="/store/auth/signin"
+                href={`${basePath}/auth/signin`}
                 className="hidden lg:flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -197,9 +199,9 @@ export default function Navbar() {
 
             {/* Cart — always visible */}
             <Link
-              href="/store/cart"
+              href={`${basePath}/cart`}
               className={`relative flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-lg transition ${
-                pathname === '/store/cart' ? 'text-accent bg-accent/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                pathname === `${basePath}/cart` ? 'text-accent bg-accent/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
               aria-label={itemCount > 0 ? `Cart with ${itemCount} item${itemCount > 1 ? 's' : ''}` : 'Cart'}
             >

@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import AppShell from '@/components/AppShell'
 import SavingOverlay from '@/components/SavingOverlay'
-import { createPayment } from '@/lib/db/payments'
-import { getCustomers, type DbCustomer } from '@/lib/db/customers'
+import type { DbCustomer } from '@/lib/db/customers'
 import CustomSelect from '@/components/CustomSelect'
 import { useShop } from '@/providers/shop-provider'
 import { useQuery, useMutation } from '@tanstack/react-query'
@@ -22,14 +21,29 @@ export default function NewPaymentPage() {
   const router = useRouter()
   const { shopId } = useShop()
 
-  const { data: customers = [] } = useQuery({
+  const { data: customers = [] } = useQuery<DbCustomer[]>({
     queryKey: ['customers', shopId],
-    queryFn: () => getCustomers(shopId),
+    queryFn: async () => {
+      const res = await fetch(`/api/customers?shopId=${shopId}`)
+      if (!res.ok) throw new Error('Failed to load customers')
+      return res.json()
+    },
     enabled: !!shopId,
   })
 
   const createMut = useMutation({
-    mutationFn: (data: Parameters<typeof createPayment>[1]) => createPayment(shopId, data),
+    mutationFn: async (data: Record<string, unknown>) => {
+      const res = await fetch(`/api/payments?shopId=${shopId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Failed to create payment')
+      }
+      return res.json()
+    },
     onSuccess: () => router.push('/payments?created=1'),
     onError: (err: any) => {
       console.error('[createPayment]', err)

@@ -6,11 +6,13 @@ import Navbar from '@/components/store/Navbar'
 import Footer from '@/components/store/Footer'
 import ProductDetail from '@/components/store/product/ProductDetail'
 import { getStoreProductBySlug } from '@/lib/store/catalog-bridge'
+import { useStore } from '@/providers/store-context'
 import type { Product } from '@/types/store'
 
 export default function ProductDetailPage() {
   const params = useParams()
   const slug = params.slug as string
+  const { shopId } = useStore()
 
   const [product, setProduct] = useState<Product | null>(null)
   const [notFoundState, setNotFoundState] = useState(false)
@@ -20,7 +22,7 @@ export default function ProductDetailPage() {
     let cancelled = false
     async function load() {
       try {
-        const match = await getStoreProductBySlug(slug)
+        const match = await getStoreProductBySlug(slug, shopId || undefined)
         if (!cancelled) {
           if (match) {
             setProduct(match)
@@ -36,7 +38,7 @@ export default function ProductDetailPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [slug])
+  }, [slug, shopId])
 
   if (notFoundState) notFound()
   if (loading || !product) return (

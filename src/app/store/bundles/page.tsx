@@ -9,6 +9,7 @@ import { type PageSection, DEFAULT_PAGE_SECTIONS } from '@/lib/store-builder'
 import { type DbBundle } from '@/lib/db/bundles'
 import { type DbProduct } from '@/lib/db/catalog'
 import { useCartStore } from '@/lib/store/cart-store'
+import { useStore } from '@/providers/store-context'
 import { formatMYR } from '@/lib/store/pricing-engine'
 
 export default function BundlesPage() {
@@ -17,14 +18,17 @@ export default function BundlesPage() {
   const [catalogProducts, setCatalogProducts] = useState<DbProduct[]>([])
   const addItem = useCartStore((s) => s.addItem)
   const [addedId, setAddedId] = useState<string | null>(null)
+  const { shopId, basePath } = useStore()
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
+        const params = new URLSearchParams()
+        if (shopId) params.set('shopId', shopId)
         const [pageRes, bundlesRes] = await Promise.all([
-          fetch('/api/store/pages?pageId=bundles'),
-          fetch('/api/store/bundles'),
+          fetch(`/api/store/pages?pageId=bundles&${params}`),
+          fetch(`/api/store/bundles?${params}`),
         ])
         const { page } = await pageRes.json()
         const { bundles: dbBundles, products: prods } = await bundlesRes.json()
@@ -39,7 +43,7 @@ export default function BundlesPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [])
+  }, [shopId])
 
   /** Calculate original price dynamically from catalog items instead of stored value */
   function getOriginalPrice(bundle: DbBundle): number {
@@ -98,7 +102,7 @@ export default function BundlesPage() {
         {bundles.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-gray-400 mb-4">No active bundles at the moment.</p>
-            <Link href="/store/products" className="text-accent font-semibold hover:underline">Browse Products</Link>
+            <Link href={`${basePath}/products`} className="text-accent font-semibold hover:underline">Browse Products</Link>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

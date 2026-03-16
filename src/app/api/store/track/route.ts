@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     const orderId = req.nextUrl.searchParams.get('orderId')
     if (!orderId) return NextResponse.json({ error: 'orderId is required' }, { status: 400 })
 
-    const shopId = process.env.NEXT_PUBLIC_SHOP_ID!
+    const shopId = req.nextUrl.searchParams.get('shopId') || process.env.NEXT_PUBLIC_SHOP_ID!
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -9,10 +9,12 @@ import { useCartStore } from '@/lib/store/cart-store'
 import { formatMYR } from '@/lib/store/pricing-engine'
 import OrderStatusBadge from '@/components/store/account/OrderStatusBadge'
 import { Order } from '@/types/store'
+import { useStore } from '@/providers/store-context'
 
 export default function OrdersPage() {
   const user = useAuthStore((s) => s.currentUser)
   const router = useRouter()
+  const { basePath } = useStore()
   const [notice, setNotice] = useState<string | null>(null)
 
   if (!user) return null
@@ -32,7 +34,7 @@ export default function OrdersPage() {
     if (result.skipped.length > 0) messages.push(`${result.skipped.join(', ')} skipped`)
     if (result.priceChanged) messages.push('Prices updated')
     setNotice(messages.join(' · '))
-    if (result.added > 0) setTimeout(() => router.push('/store/cart'), 1500)
+    if (result.added > 0) setTimeout(() => router.push(`${basePath}/cart`), 1500)
   }
 
   return (
@@ -55,7 +57,7 @@ export default function OrdersPage() {
           </svg>
           <p className="text-sm text-gray-500 mb-4">You don&apos;t have any orders yet</p>
           <Link
-            href="/store/products"
+            href={`${basePath}/products`}
             className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
           >
             Browse Products
@@ -70,7 +72,7 @@ export default function OrdersPage() {
           {orders.map((order) => (
             <Link
               key={order.id}
-              href={`/store/account/orders/${order.id}`}
+              href={`${basePath}/account/orders/${order.id}`}
               className="block bg-white rounded-2xl border border-gray-100 hover:border-gray-200 transition p-5"
             >
               <div className="flex items-start justify-between gap-4">

@@ -5,6 +5,7 @@ import type { PageSection } from '@/lib/store-builder'
 import AnimateIn from '@/components/store/AnimateIn'
 import EditableText, { type SectionEditCtx } from './EditableText'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
+import { useStore } from '@/providers/store-context'
 
 export default function HeroSection({ section, editMode, sectionId, onEdit }: { section: PageSection } & SectionEditCtx) {
   const { badge, headline, subtitle, ctaPrimary, ctaSecondary, ctaPrimaryAction, ctaSecondaryAction } = section.props
@@ -12,13 +13,14 @@ export default function HeroSection({ section, editMode, sectionId, onEdit }: { 
   const isCentered = section.variant === 'centered' || isGradient
   const ep = { editMode, sectionId, onEdit }
   const g = useStoreGlobal()
+  const { basePath } = useStore()
 
   function resolveHref(action?: string) {
-    if (!action) return '/store/products'
-    if (action === 'quote') return '/store/contact'
+    if (!action) return `${basePath}/products`
+    if (action === 'quote') return `${basePath}/contact`
     if (action === 'whatsapp') return `https://wa.me/${g.contactWhatsapp.replace(/[^0-9]/g, '')}`
     if (action.startsWith('/') || action.startsWith('http')) return action
-    return '/store/products'
+    return `${basePath}/products`
   }
 
   return (

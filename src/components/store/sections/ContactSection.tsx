@@ -6,6 +6,7 @@ import type { PageSection } from '@/lib/store-builder'
 import AnimateIn from '@/components/store/AnimateIn'
 import EditableText, { type SectionEditCtx } from './EditableText'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
+import { useStore } from '@/providers/store-context'
 
 export default function ContactSection({ section, editMode, sectionId, onEdit }: { section: PageSection } & SectionEditCtx) {
   const { title, subtitle, showForm } = section.props
@@ -13,6 +14,7 @@ export default function ContactSection({ section, editMode, sectionId, onEdit }:
   const [submitted, setSubmitted] = useState(false)
   const ep = { editMode, sectionId, onEdit }
   const g = useStoreGlobal()
+  const { basePath } = useStore()
 
   const CONTACT_INFO = [
     { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>, title: 'Visit Us', lines: [g.shopName, g.contactAddress] },
@@ -107,7 +109,7 @@ export default function ContactSection({ section, editMode, sectionId, onEdit }:
             <div className="rounded-2xl bg-accent/5 border border-accent/10 p-6">
               <div className="font-bold text-gray-900 mb-1">Need a custom quote?</div>
               <p className="text-sm text-gray-500 mb-4">For large or custom orders, our team can create a tailored pricing plan for your business.</p>
-              <Link href="/store/membership" className="inline-block px-5 py-2 rounded-xl text-sm font-semibold bg-accent text-white hover:opacity-90 transition">
+              <Link href={`${basePath}/membership`} className="inline-block px-5 py-2 rounded-xl text-sm font-semibold bg-accent text-white hover:opacity-90 transition">
                 View Membership Plans
               </Link>
             </div>

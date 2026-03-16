@@ -8,6 +8,7 @@ import NewsletterCTA from '@/components/store/NewsletterCTA'
 import { SectionRenderer } from '@/components/store/sections'
 import { type PageSection, DEFAULT_PAGE_SECTIONS } from '@/lib/store-builder'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
+import { useStore } from '@/providers/store-context'
 
 type TrackStatus = 'received' | 'production' | 'quality' | 'shipped'
 
@@ -39,6 +40,7 @@ export default function TrackPage() {
 function TrackContent() {
   const searchParams = useSearchParams()
   const globalSettings = useStoreGlobal()
+  const { shopId } = useStore()
   const [sections, setSections] = useState<PageSection[]>([])
   const [orderId, setOrderId] = useState(searchParams.get('id') ?? '')
   const [result, setResult] = useState<{ status: TrackStatus; eta: string; customer: string; created: string; dueDate: string } | null>(null)
@@ -50,7 +52,9 @@ function TrackContent() {
     let cancelled = false
     async function load() {
       try {
-        const res = await fetch('/api/store/pages?pageId=track')
+        const params = new URLSearchParams({ pageId: 'track' })
+        if (shopId) params.set('shopId', shopId)
+        const res = await fetch(`/api/store/pages?${params}`)
         const { page } = await res.json()
         if (!cancelled) {
           setSections((page?.sections as PageSection[]) ?? DEFAULT_PAGE_SECTIONS.track())
@@ -61,7 +65,7 @@ function TrackContent() {
     }
     load()
     return () => { cancelled = true }
-  }, [])
+  }, [shopId])
 
   useEffect(() => {
     const id = searchParams.get('id')
@@ -72,7 +76,9 @@ function TrackContent() {
   async function doSearch(id: string) {
     setSearching(true)
     try {
-      const res = await fetch(`/api/store/track?orderId=${encodeURIComponent(id.trim().toUpperCase())}`)
+      const params = new URLSearchParams({ orderId: id.trim().toUpperCase() })
+      if (shopId) params.set('shopId', shopId)
+      const res = await fetch(`/api/store/track?${params}`)
       const { order } = await res.json()
       setSearched(true)
       if (order) {

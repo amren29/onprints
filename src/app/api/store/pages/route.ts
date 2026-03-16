@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   try {
     const pageId = req.nextUrl.searchParams.get('pageId') || 'homepage'
-    const shopId = process.env.NEXT_PUBLIC_SHOP_ID!
+    const shopId = req.nextUrl.searchParams.get('shopId') || process.env.NEXT_PUBLIC_SHOP_ID!
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

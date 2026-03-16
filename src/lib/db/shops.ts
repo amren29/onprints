@@ -68,6 +68,19 @@ export async function createShop(data: {
   return { error: null, shop }
 }
 
+export async function getShopBySlug(slug: string) {
+  const admin = supabaseAdmin
+
+  const { data, error } = await admin
+    .from('shops')
+    .select('id, slug, name, logo_url, currency, settings')
+    .eq('slug', slug)
+    .maybeSingle()
+
+  if (error) return null
+  return data
+}
+
 export async function getUserShop() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

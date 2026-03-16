@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
+'use client'
+
 import Link from 'next/link'
 import Navbar from '@/components/store/Navbar'
 import Footer from '@/components/store/Footer'
 import NewsletterCTA from '@/components/store/NewsletterCTA'
 import AnimateIn from '@/components/store/AnimateIn'
-
-export const metadata: Metadata = { title: 'Agent Partnership — SaasPrint Store' }
+import { useStore } from '@/providers/store-context'
 
 const BENEFITS = [
   {
@@ -54,6 +54,7 @@ const HOW_IT_WORKS = [
 ]
 
 export default function PartnershipPage() {
+  const { basePath } = useStore()
   return (
     <>
       <Navbar />
@@ -157,10 +158,10 @@ export default function PartnershipPage() {
               Get in touch with our partnerships team. We will review your application and get back to you within 1–2 working days.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/store/contact" className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold bg-accent text-white hover:opacity-90 transition">
+              <Link href={`${basePath}/contact`} className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold bg-accent text-white hover:opacity-90 transition">
                 Apply Now
               </Link>
-              <Link href="/store/faq" className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 transition">
+              <Link href={`${basePath}/faq`} className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 transition">
                 Read FAQ
               </Link>
             </div>

@@ -6,11 +6,13 @@ import { useAuthStore } from '@/lib/store/auth-store'
 import { useCanvaTokensFromCookie } from '@/lib/store/use-canva-tokens'
 import { formatMYR } from '@/lib/store/pricing-engine'
 import OrderStatusBadge from '@/components/store/account/OrderStatusBadge'
+import { useStore } from '@/providers/store-context'
 
 // ── Canva Section ────────────────────────────────────────────────────────────
 
 function CanvaSection({ user }: { user: NonNullable<ReturnType<typeof useAuthStore.getState>['currentUser']> }) {
   const clearCanvaTokens = useAuthStore((s) => s.clearCanvaTokens)
+  const { basePath } = useStore()
   if (!process.env.NEXT_PUBLIC_CANVA_CLIENT_ID) return null
 
   return (
@@ -45,7 +47,7 @@ function CanvaSection({ user }: { user: NonNullable<ReturnType<typeof useAuthSto
           </button>
         ) : (
           <a
-            href="/api/store/canva/authorize?returnTo=/store/account"
+            href={`/api/store/canva/authorize?returnTo=${basePath}/account`}
             className="px-4 py-2 rounded-lg text-sm font-medium bg-[#7B2FBE] text-white hover:bg-[#6B21A8] transition"
           >
             Connect Canva
@@ -59,10 +61,11 @@ function CanvaSection({ user }: { user: NonNullable<ReturnType<typeof useAuthSto
 // ── Quick Actions ────────────────────────────────────────────────────────────
 
 function QuickActions() {
+  const { basePath } = useStore()
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
       <Link
-        href="/store/products"
+        href={`${basePath}/products`}
         className="flex items-center gap-3 bg-white rounded-xl border border-gray-100 px-4 py-3.5 text-sm font-medium text-gray-700 hover:border-accent/30 hover:text-accent transition"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
@@ -72,7 +75,7 @@ function QuickActions() {
         Browse Products
       </Link>
       <Link
-        href="/store/account/profile"
+        href={`${basePath}/account/profile`}
         className="flex items-center gap-3 bg-white rounded-xl border border-gray-100 px-4 py-3.5 text-sm font-medium text-gray-700 hover:border-accent/30 hover:text-accent transition"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
@@ -82,7 +85,7 @@ function QuickActions() {
         Edit Profile
       </Link>
       <Link
-        href="/store/account/addresses"
+        href={`${basePath}/account/addresses`}
         className="flex items-center gap-3 bg-white rounded-xl border border-gray-100 px-4 py-3.5 text-sm font-medium text-gray-700 hover:border-accent/30 hover:text-accent transition col-span-2 md:col-span-1"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
@@ -99,6 +102,7 @@ function QuickActions() {
 
 export default function AccountDashboard() {
   const user = useAuthStore((s) => s.currentUser)
+  const { basePath } = useStore()
   useCanvaTokensFromCookie()
   if (!user) return null
 
@@ -147,12 +151,12 @@ export default function AccountDashboard() {
               <p className="text-sm font-semibold text-gray-900">
                 {new Date(user.membership!.expiryDate).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}
               </p>
-              <Link href="/store/account/membership" className="text-xs font-semibold text-accent hover:underline mt-1 inline-block">Manage</Link>
+              <Link href={`${basePath}/account/membership`} className="text-xs font-semibold text-accent hover:underline mt-1 inline-block">Manage</Link>
             </div>
           </div>
         </div>
       ) : !isAgent ? (
-        <Link href="/store/account/membership" className="block bg-gradient-to-r from-accent/5 to-blue-50 rounded-2xl border border-accent/20 p-5 hover:border-accent/40 transition">
+        <Link href={`${basePath}/account/membership`} className="block bg-gradient-to-r from-accent/5 to-blue-50 rounded-2xl border border-accent/20 p-5 hover:border-accent/40 transition">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-medium text-accent uppercase tracking-wider">Membership</p>
@@ -174,7 +178,7 @@ export default function AccountDashboard() {
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Spent</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">{formatMYR(totalSpent)}</p>
         </div>
-        <Link href="/store/account/wallet" className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-5 hover:border-green-300 transition">
+        <Link href={`${basePath}/account/wallet`} className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-5 hover:border-green-300 transition">
           <p className="text-xs font-medium text-green-700 uppercase tracking-wider">Wallet Balance</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">{formatMYR(user.walletBalance ?? 0)}</p>
           <p className="text-xs font-semibold text-green-600 mt-1">Top Up &rarr;</p>
@@ -190,7 +194,7 @@ export default function AccountDashboard() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="text-sm font-bold text-gray-900">Recent Orders</h2>
           {user.orders.length > 0 && (
-            <Link href="/store/account/orders" className="text-xs font-semibold text-accent hover:underline">
+            <Link href={`${basePath}/account/orders`} className="text-xs font-semibold text-accent hover:underline">
               View all
             </Link>
           )}
@@ -200,7 +204,7 @@ export default function AccountDashboard() {
           <div className="px-6 py-10 text-center">
             <p className="text-sm text-gray-400 mb-3">No orders yet</p>
             <Link
-              href="/store/products"
+              href={`${basePath}/products`}
               className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
             >
               Browse Products
@@ -215,7 +219,7 @@ export default function AccountDashboard() {
             {recentOrders.map((order) => (
               <Link
                 key={order.id}
-                href={`/store/account/orders/${order.id}`}
+                href={`${basePath}/account/orders/${order.id}`}
                 className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition"
               >
                 <div className="min-w-0">

@@ -186,13 +186,14 @@ export function dbProductToProduct(item: DbProduct, categoryName: string): Produ
 }
 
 /* ── Get all store products from Supabase ────── */
-export async function getStoreProducts(): Promise<Product[]> {
+export async function getStoreProducts(shopId?: string): Promise<Product[]> {
   // Use API route instead of server actions (compatible with Cloudflare Workers)
   const baseUrl = typeof window !== 'undefined'
     ? ''
     : (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000')
 
-  const res = await fetch(`${baseUrl}/api/store/products`, { cache: 'no-store' })
+  const params = shopId ? `?shopId=${shopId}` : ''
+  const res = await fetch(`${baseUrl}/api/store/products${params}`, { cache: 'no-store' })
   if (!res.ok) return []
 
   const { products, categories } = await res.json() as {
@@ -208,14 +209,14 @@ export async function getStoreProducts(): Promise<Product[]> {
 }
 
 /* ── Get a single product by slug ─────────────────── */
-export async function getStoreProductBySlug(slug: string): Promise<Product | null> {
-  const products = await getStoreProducts()
+export async function getStoreProductBySlug(slug: string, shopId?: string): Promise<Product | null> {
+  const products = await getStoreProducts(shopId)
   return products.find(p => p.slug === slug) || null
 }
 
 /* ── Get unique categories from current catalog ───── */
-export async function getStoreCategories(): Promise<{ id: ProductCategory; label: string; description: string }[]> {
-  const products = await getStoreProducts()
+export async function getStoreCategories(shopId?: string): Promise<{ id: ProductCategory; label: string; description: string }[]> {
+  const products = await getStoreProducts(shopId)
   const seen = new Set<string>()
   const cats: { id: ProductCategory; label: string; description: string }[] = []
 

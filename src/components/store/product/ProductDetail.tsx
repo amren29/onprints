@@ -9,6 +9,7 @@ import { useCartStore } from '@/lib/store/cart-store'
 import { useAuthStore } from '@/lib/store/auth-store'
 import { useCanvaTokensFromCookie } from '@/lib/store/use-canva-tokens'
 import { getStoreProducts, getStoreCategories } from '@/lib/store/catalog-bridge'
+import { useStore } from '@/providers/store-context'
 import NewsletterCTA from '@/components/store/NewsletterCTA'
 import AnimateIn from '@/components/store/AnimateIn'
 import CanvaDesignPicker from '@/components/store/canva/CanvaDesignPicker'
@@ -248,6 +249,7 @@ export default function ProductDetail({ product }: Props) {
   const router = useRouter()
   const addItem = useCartStore((s) => s.addItem)
   const currentUser = useAuthStore((s) => s.currentUser)
+  const { basePath } = useStore()
 
   const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string>>(() => {
     const init: Record<string, string> = {}
@@ -373,7 +375,7 @@ export default function ProductDetail({ product }: Props) {
 
   function handleAddToCartAndCheckout() {
     addItem(buildCartItem())
-    router.push('/store/cart')
+    router.push(`${basePath}/cart`)
   }
 
   const canvaConfigured = !!process.env.NEXT_PUBLIC_CANVA_CLIENT_ID
@@ -391,18 +393,18 @@ export default function ProductDetail({ product }: Props) {
       return
     }
     if (!currentUser) {
-      router.push(`/store/auth/signin?returnTo=/store/products/${product.slug}`)
+      router.push(`${basePath}/auth/signin?returnTo=${basePath}/products/${product.slug}`)
       return
     }
     if (!currentUser.canvaTokens?.accessToken || currentUser.canvaTokens.expiresAt < Date.now()) {
-      window.location.href = `/api/store/canva/authorize?returnTo=/store/products/${product.slug}`
+      window.location.href = `/api/store/canva/authorize?returnTo=${basePath}/products/${product.slug}`
       return
     }
     setCanvaPickerOpen(true)
   }
 
   function handleCanvaDesignExported(imageUrl: string, designId: string) {
-    router.push(`/store/products/${product.slug}/proof?canvaImage=${encodeURIComponent(imageUrl)}&canvaDesignId=${designId}`)
+    router.push(`${basePath}/products/${product.slug}/proof?canvaImage=${encodeURIComponent(imageUrl)}&canvaDesignId=${designId}`)
   }
 
   return (
@@ -410,9 +412,9 @@ export default function ProductDetail({ product }: Props) {
       <main className="max-w-screen-xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-400 mb-6 flex items-center gap-2">
-          <Link href="/store/products" className="hover:text-accent transition">Products</Link>
+          <Link href={`${basePath}/products`} className="hover:text-accent transition">Products</Link>
           <span>/</span>
-          <Link href={`/store/products?cat=${product.category}`} className="hover:text-accent transition">
+          <Link href={`${basePath}/products?cat=${product.category}`} className="hover:text-accent transition">
             {categoryInfo?.label ?? product.category}
           </Link>
           <span>/</span>
@@ -666,7 +668,7 @@ export default function ProductDetail({ product }: Props) {
               <div className="text-sm font-semibold text-gray-700 mb-3">Artwork</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Link
-                  href={`/store/products/${product.slug}/proof?${new URLSearchParams({ ...selectedSpecs, qty: String(selectedQty) }).toString()}`}
+                  href={`${basePath}/products/${product.slug}/proof?${new URLSearchParams({ ...selectedSpecs, qty: String(selectedQty) }).toString()}`}
                   className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold text-xs sm:text-sm hover:border-gray-400 hover:bg-gray-50 transition-all"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -684,7 +686,7 @@ export default function ProductDetail({ product }: Props) {
                   Design with Canva
                 </button>
                 <Link
-                  href="/store/contact?subject=Request+Design"
+                  href={`${basePath}/contact?subject=Request+Design`}
                   className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold text-xs sm:text-sm hover:border-gray-400 hover:bg-gray-50 transition-all"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -753,7 +755,7 @@ export default function ProductDetail({ product }: Props) {
                   const item = variantBuilderRef.current?.buildCartItem()
                   if (!item) return
                   addItem(item)
-                  router.push('/store/cart')
+                  router.push(`${basePath}/cart`)
                 }}
                 className="flex-[1.3] py-3.5 rounded-xl font-bold text-sm bg-accent text-white hover:opacity-90 transition"
               >
@@ -821,7 +823,7 @@ export default function ProductDetail({ product }: Props) {
                 ) : (
                   <div className="bg-gray-50 rounded-2xl p-4 text-center">
                     <p className="text-sm text-gray-500">
-                      <Link href="/store/login" className="text-accent font-semibold hover:underline">Sign in</Link> to write a review.
+                      <Link href={`${basePath}/auth/signin`} className="text-accent font-semibold hover:underline">Sign in</Link> to write a review.
                     </p>
                   </div>
                 )}
@@ -1067,7 +1069,7 @@ export default function ProductDetail({ product }: Props) {
               <h2 className="text-lg font-bold text-gray-900 mb-6">Related Products</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {relatedProducts.map((p) => (
-                  <Link key={p.id} href={`/store/products/${p.slug}`} className="group">
+                  <Link key={p.id} href={`${basePath}/products/${p.slug}`} className="group">
                     <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 mb-3">
                       {PRODUCT_IMAGES[p.slug] ? (
                         <img src={PRODUCT_IMAGES[p.slug]} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

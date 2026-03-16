@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 // TODO [Batch G]: Replace auth-store with Supabase store-users
 import { useAuthStore } from '@/lib/store/auth-store'
 import Navbar from '@/components/store/Navbar'
+import { useStore } from '@/providers/store-context'
 
 export default function CanvaReturnPage() {
   return (
@@ -23,6 +24,7 @@ export default function CanvaReturnPage() {
 
 function CanvaReturnContent() {
   const router = useRouter()
+  const { basePath } = useStore()
   const searchParams = useSearchParams()
   const canvaTokens = useAuthStore((s) => s.currentUser?.canvaTokens)
 
@@ -68,7 +70,7 @@ function CanvaReturnContent() {
             const imageUrl = urls[0]
             if (imageUrl && slug) {
               setStatus('done')
-              router.push(`/store/products/${slug}/proof?canvaImage=${encodeURIComponent(imageUrl)}&canvaDesignId=${designId}`)
+              router.push(`${basePath}/products/${slug}/proof?canvaImage=${encodeURIComponent(imageUrl)}&canvaDesignId=${designId}`)
               return
             }
             throw new Error('Export completed but no URL returned')
@@ -132,7 +134,7 @@ function CanvaReturnContent() {
                   Try Again
                 </button>
                 <button
-                  onClick={() => router.push(slug ? `/store/products/${slug}` : '/store/products')}
+                  onClick={() => router.push(slug ? `${basePath}/products/${slug}` : `${basePath}/products`)}
                   className="px-5 py-2.5 rounded-xl border-2 border-gray-200 text-gray-700 font-bold text-sm hover:border-gray-400 transition"
                 >
                   Back to Product

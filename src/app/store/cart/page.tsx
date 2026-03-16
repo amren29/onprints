@@ -10,11 +10,13 @@ import { formatMYR } from '@/lib/store/pricing-engine'
 import { TAX_CONFIG } from '@/config/store/tax'
 import { getStoreProductBySlug } from '@/lib/store/catalog-bridge'
 import { fetchStoreSettings, type StoreSettings, DEFAULTS as SETTINGS_DEFAULTS } from '@/lib/store-settings-store'
+import { useStore } from '@/providers/store-context'
 import type { Product } from '@/types/store'
 
 export default function CartPage() {
   const { items, removeItem, updateQty } = useCartStore()
   const router = useRouter()
+  const { basePath, shopId } = useStore()
   const [expandedBulk, setExpandedBulk] = useState<Set<string>>(new Set())
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(SETTINGS_DEFAULTS)
   const [productCache, setProductCache] = useState<Record<string, Product | null>>({})
@@ -33,7 +35,7 @@ export default function CartPage() {
 
     Promise.all(
       slugsToLoad.map(async slug => {
-        const p = await getStoreProductBySlug(slug)
+        const p = await getStoreProductBySlug(slug, shopId)
         return [slug, p] as const
       })
     ).then(results => {
@@ -65,7 +67,7 @@ export default function CartPage() {
           <div className="text-center text-gray-400">
             <p className="text-lg font-semibold text-gray-500 mb-2">Your cart is empty</p>
             <p className="text-sm mb-6">Add some products to get started.</p>
-            <Link href="/store/products" className="inline-block bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
+            <Link href={`${basePath}/products`} className="inline-block bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
               Browse Products
             </Link>
           </div>
@@ -91,7 +93,7 @@ export default function CartPage() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <Link href={`/store/products/${item.slug}`} className="font-semibold text-gray-900 hover:text-accent transition text-sm leading-tight">
+                    <Link href={`${basePath}/products/${item.slug}`} className="font-semibold text-gray-900 hover:text-accent transition text-sm leading-tight">
                       {item.name}
                     </Link>
                     <button
@@ -133,7 +135,7 @@ export default function CartPage() {
                         </div>
                       )}
                       <div className="flex items-center justify-between mt-3">
-                        <Link href={`/store/products/${item.slug}`} className="text-xs text-accent hover:underline">Edit variants</Link>
+                        <Link href={`${basePath}/products/${item.slug}`} className="text-xs text-accent hover:underline">Edit variants</Link>
                         <div className="text-right">
                           <div className="font-bold text-gray-900">{formatMYR(item.total)}</div>
                         </div>
@@ -150,7 +152,7 @@ export default function CartPage() {
                       ) : (
                         <div className="flex flex-wrap items-center gap-2 mt-2">
                           <Link
-                            href={`/store/products/${item.slug}/proof?${new URLSearchParams(item.selectedSpecs).toString()}`}
+                            href={`${basePath}/products/${item.slug}/proof?${new URLSearchParams(item.selectedSpecs).toString()}`}
                             className="inline-flex items-center gap-1.5 text-xs font-medium bg-accent/10 text-accent px-3 py-1.5 rounded-lg hover:bg-accent/20 transition"
                           >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -177,7 +179,7 @@ export default function CartPage() {
                             )
                           })()}
                           <Link
-                            href="/store/contact?subject=Request+Design"
+                            href={`${basePath}/contact?subject=Request+Design`}
                             className="inline-flex items-center gap-1.5 text-xs font-medium bg-orange-50 text-orange-700 px-3 py-1.5 rounded-lg hover:bg-orange-100 transition"
                           >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -248,12 +250,12 @@ export default function CartPage() {
                 </p>
               </div>
               <button
-                onClick={() => router.push('/store/checkout')}
+                onClick={() => router.push(`${basePath}/checkout`)}
                 className="w-full bg-accent text-white font-bold py-3 rounded-xl hover:opacity-90 transition"
               >
                 Proceed to Checkout
               </button>
-              <Link href="/store/products" className="block text-center text-sm text-gray-400 hover:text-accent transition mt-3">
+              <Link href={`${basePath}/products`} className="block text-center text-sm text-gray-400 hover:text-accent transition mt-3">
                 Continue Shopping
               </Link>
             </div>

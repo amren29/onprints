@@ -1,6 +1,7 @@
 'use client'
 
 import { useAuthStore } from '@/lib/store/auth-store'
+import { useStore } from '@/providers/store-context'
 
 interface Props {
   returnTo?: string
@@ -16,6 +17,7 @@ interface Props {
 export default function CanvaConnectButton({ returnTo = '/', className = '', onConnected }: Props) {
   const currentUser = useAuthStore((s) => s.currentUser)
   const clearCanvaTokens = useAuthStore((s) => s.clearCanvaTokens)
+  const { basePath } = useStore()
 
   const isConnected = !!currentUser?.canvaTokens?.accessToken
   const isExpired = currentUser?.canvaTokens?.expiresAt
@@ -25,7 +27,7 @@ export default function CanvaConnectButton({ returnTo = '/', className = '', onC
   function handleClick() {
     if (!currentUser) {
       // Not logged in — redirect to login
-      window.location.href = '/store/auth/signin?returnTo=' + encodeURIComponent(returnTo)
+      window.location.href = `${basePath}/auth/signin?returnTo=` + encodeURIComponent(returnTo)
       return
     }
 

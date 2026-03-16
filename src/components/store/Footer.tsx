@@ -3,31 +3,39 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
+import { useStore } from '@/providers/store-context'
 // TODO [Batch H]: Replace with DB-backed store settings
 import { getStoreSettings } from '@/lib/store-settings-store'
 
-const SHOP_LINKS = [
-  { href: '/store/products', label: 'All Products' },
-  { href: '/store/products?cat=cards', label: 'Business Cards' },
-  { href: '/store/products?cat=marketing', label: 'Flyers & Brochures' },
-  { href: '/store/products?cat=large-format', label: 'Banners' },
-  { href: '/store/products?cat=stickers', label: 'Stickers & Labels' },
-]
+function getShopLinks(basePath: string) {
+  return [
+    { href: `${basePath}/products`, label: 'All Products' },
+    { href: `${basePath}/products?cat=cards`, label: 'Business Cards' },
+    { href: `${basePath}/products?cat=marketing`, label: 'Flyers & Brochures' },
+    { href: `${basePath}/products?cat=large-format`, label: 'Banners' },
+    { href: `${basePath}/products?cat=stickers`, label: 'Stickers & Labels' },
+  ]
+}
 
-const PROGRAMS_LINKS = [
-  { href: '/store/membership', label: 'Membership' },
-  { href: '/store/partnership', label: 'Partnership' },
-]
+function getProgramsLinks(basePath: string) {
+  return [
+    { href: `${basePath}/membership`, label: 'Membership' },
+    { href: `${basePath}/partnership`, label: 'Partnership' },
+  ]
+}
 
-const COMPANY_LINKS = [
-  { href: '/store/about', label: 'About' },
-  { href: '/store/how-to-order', label: 'How to Order' },
-  { href: '/store/faq', label: 'FAQ' },
-  { href: '/store/contact', label: 'Contact Us' },
-]
+function getCompanyLinks(basePath: string) {
+  return [
+    { href: `${basePath}/about`, label: 'About' },
+    { href: `${basePath}/how-to-order`, label: 'How to Order' },
+    { href: `${basePath}/faq`, label: 'FAQ' },
+    { href: `${basePath}/contact`, label: 'Contact Us' },
+  ]
+}
 
 export default function Footer() {
   const g = useStoreGlobal()
+  const { basePath } = useStore()
   const [social, setSocial] = useState<{ facebook: string; instagram: string; tiktok: string; twitter: string }>({ facebook: '', instagram: '', tiktok: '', twitter: '' })
 
   useEffect(() => {
@@ -42,7 +50,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-4 py-14 grid grid-cols-2 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="col-span-2 md:col-span-1">
-          <Link href="/store" className="text-white font-extrabold text-xl tracking-tight mb-3 block">
+          <Link href={basePath} className="text-white font-extrabold text-xl tracking-tight mb-3 block">
             {g.shopName}
           </Link>
           <p className="text-sm leading-relaxed mb-4">
@@ -83,7 +91,7 @@ export default function Footer() {
         <div>
           <div className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Shop</div>
           <div className="flex flex-col gap-2 text-sm">
-            {SHOP_LINKS.map(({ href, label }) => (
+            {getShopLinks(basePath).map(({ href, label }) => (
               <Link key={label} href={href} className="hover:text-white transition">{label}</Link>
             ))}
           </div>
@@ -93,7 +101,7 @@ export default function Footer() {
         <div>
           <div className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Programs</div>
           <div className="flex flex-col gap-2 text-sm">
-            {PROGRAMS_LINKS.map(({ href, label }) => (
+            {getProgramsLinks(basePath).map(({ href, label }) => (
               <Link key={label} href={href} className="hover:text-white transition">{label}</Link>
             ))}
           </div>
@@ -103,7 +111,7 @@ export default function Footer() {
         <div>
           <div className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Company</div>
           <div className="flex flex-col gap-2 text-sm">
-            {COMPANY_LINKS.map(({ href, label }) => (
+            {getCompanyLinks(basePath).map(({ href, label }) => (
               <Link key={label} href={href} className="hover:text-white transition">{label}</Link>
             ))}
           </div>

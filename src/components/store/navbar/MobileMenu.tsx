@@ -7,6 +7,7 @@ import { getStoreCategories } from '@/lib/store/catalog-bridge'
 import CategoryIcon from '@/components/store/CategoryIcon'
 import { useAuthStore } from '@/lib/store/auth-store'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
+import { useStore } from '@/providers/store-context'
 import type { ProductCategory } from '@/types/store'
 
 interface MobileMenuProps {
@@ -14,17 +15,19 @@ interface MobileMenuProps {
   onClose: () => void
 }
 
-const NAV_LINKS = [
-  { href: '/store', label: 'Home' },
-  { href: '/store/about', label: 'About' },
-  { href: '/store/products', label: 'Products' },
-  { href: '/store/bundles', label: 'Bundles' },
-  { href: '/store/how-to-order', label: 'How to Order' },
-  { href: '/store/membership', label: 'Membership' },
-  { href: '/store/faq', label: 'FAQ' },
-  { href: '/store/track', label: 'Track Order' },
-  { href: '/store/contact', label: 'Contact Us' },
-]
+function getNavLinks(basePath: string) {
+  return [
+    { href: basePath, label: 'Home' },
+    { href: `${basePath}/about`, label: 'About' },
+    { href: `${basePath}/products`, label: 'Products' },
+    { href: `${basePath}/bundles`, label: 'Bundles' },
+    { href: `${basePath}/how-to-order`, label: 'How to Order' },
+    { href: `${basePath}/membership`, label: 'Membership' },
+    { href: `${basePath}/faq`, label: 'FAQ' },
+    { href: `${basePath}/track`, label: 'Track Order' },
+    { href: `${basePath}/contact`, label: 'Contact Us' },
+  ]
+}
 
 const PLACEHOLDER_LINKS = [
   { label: 'Help' },
@@ -36,6 +39,7 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
   const currentUser = useAuthStore((s) => s.currentUser)
   const signOut = useAuthStore((s) => s.signOut)
   const globalSettings = useStoreGlobal()
+  const { basePath } = useStore()
   const [categories, setCategories] = useState<{ id: ProductCategory; label: string; description: string }[]>([])
 
   useEffect(() => {
@@ -95,12 +99,12 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
         <div className="overflow-y-auto h-[calc(100%-56px)] py-4">
           {/* Navigation links */}
           <div className="px-4 mb-4">
-            {NAV_LINKS.map(({ href, label }) => (
+            {getNavLinks(basePath).map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
                 className={`block py-2.5 text-sm font-medium rounded-lg px-3 transition ${
-                  (href === '/store' ? pathname === '/store' : pathname.startsWith(href))
+                  (href === basePath ? pathname === basePath : pathname.startsWith(href))
                     ? 'text-accent bg-accent/5'
                     : 'text-gray-700 hover:text-accent hover:bg-gray-50'
                 }`}
@@ -120,7 +124,7 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
             {categories.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/store/products?cat=${cat.id}`}
+                href={`${basePath}/products?cat=${cat.id}`}
                 className="flex items-center gap-3 py-2.5 text-sm text-gray-600 hover:text-accent transition rounded-lg px-3 hover:bg-gray-50"
               >
                 <CategoryIcon category={cat.id} size={18} className="text-gray-400 shrink-0" />
@@ -150,17 +154,17 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
                   )}
                 </div>
                 {[
-                  { href: '/store/account', label: 'Dashboard' },
-                  { href: '/store/account/orders', label: 'My Orders' },
-                  { href: '/store/account/profile', label: 'Profile' },
-                  { href: '/store/account/artwork', label: 'Artwork Library' },
-                  { href: '/store/account/addresses', label: 'Addresses' },
+                  { href: `${basePath}/account`, label: 'Dashboard' },
+                  { href: `${basePath}/account/orders`, label: 'My Orders' },
+                  { href: `${basePath}/account/profile`, label: 'Profile' },
+                  { href: `${basePath}/account/artwork`, label: 'Artwork Library' },
+                  { href: `${basePath}/account/addresses`, label: 'Addresses' },
                 ].map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={`block py-2.5 text-sm font-medium rounded-lg px-3 transition ${
-                      pathname.startsWith(link.href) && (link.href !== '/store/account' || pathname === '/store/account')
+                      pathname.startsWith(link.href) && (link.href !== `${basePath}/account` || pathname === `${basePath}/account`)
                         ? 'text-accent bg-accent/5'
                         : 'text-gray-700 hover:text-accent hover:bg-gray-50'
                     }`}
@@ -180,7 +184,7 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
               </>
             ) : (
               <Link
-                href="/store/auth/signin"
+                href={`${basePath}/auth/signin`}
                 className="flex items-center gap-3 py-2.5 text-sm font-medium text-accent rounded-lg px-3 hover:bg-accent/5 transition"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

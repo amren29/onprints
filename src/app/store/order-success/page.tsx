@@ -15,6 +15,7 @@ import { removeCurrentSession } from '@/lib/store/abandoned-cart-tracker'
 // TODO [Batch G]: Replace notification-store with Supabase
 import { addNotification } from '@/lib/notification-store'
 import { fetchStoreSettings, type StoreSettings, DEFAULTS as SETTINGS_DEFAULTS } from '@/lib/store-settings-store'
+import { useStore } from '@/providers/store-context'
 
 const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID!
 
@@ -46,6 +47,7 @@ export default function OrderSuccessPage() {
 }
 
 function OrderSuccessContent() {
+  const { basePath } = useStore()
   const params = useSearchParams()
   const billplzId = params.get('billplz_id')
   const isTransfer = params.get('method') === 'transfer'
@@ -314,10 +316,10 @@ function OrderSuccessContent() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment Issue</h1>
           <p className="text-gray-500 mb-6">{error}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/store/checkout" className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
+            <Link href={`${basePath}/checkout`} className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
               Try Again
             </Link>
-            <Link href="/store/products" className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
+            <Link href={`${basePath}/products`} className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
               Continue Shopping
             </Link>
           </div>
@@ -343,10 +345,10 @@ function OrderSuccessContent() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">No Order Found</h1>
           <p className="text-gray-500 mb-6">We couldn&apos;t find any order details. This may happen if you refreshed the page.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/store/track" className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
+            <Link href={`${basePath}/track`} className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
               Track an Order
             </Link>
-            <Link href="/store/products" className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
+            <Link href={`${basePath}/products`} className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
               Continue Shopping
             </Link>
           </div>
@@ -525,13 +527,13 @@ function OrderSuccessContent() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            href={`/store/track?id=${orderId}`}
+            href={`${basePath}/track?id=${orderId}`}
             className="flex-1 text-center border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition"
           >
             Track Order
           </Link>
           <Link
-            href="/store/products"
+            href={`${basePath}/products`}
             className="flex-1 text-center bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition"
           >
             Continue Shopping

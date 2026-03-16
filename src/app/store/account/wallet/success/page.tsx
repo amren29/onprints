@@ -6,6 +6,7 @@ import Link from 'next/link'
 // TODO [Batch G]: Replace auth-store with Supabase store-users
 import { useAuthStore } from '@/lib/store/auth-store'
 import { formatMYR } from '@/lib/store/pricing-engine'
+import { useStore } from '@/providers/store-context'
 
 export default function WalletSuccessPage() {
   return (
@@ -16,6 +17,7 @@ export default function WalletSuccessPage() {
 }
 
 function WalletSuccessContent() {
+  const { basePath } = useStore()
   const params = useSearchParams()
   const billplzId = params.get('billplz_id')
 
@@ -105,7 +107,7 @@ function WalletSuccessContent() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Top-Up Issue</h1>
           <p className="text-gray-500 mb-6">{error}</p>
-          <Link href="/store/account/wallet" className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
+          <Link href={`${basePath}/account/wallet`} className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
             Back to Wallet
           </Link>
         </div>
@@ -135,10 +137,10 @@ function WalletSuccessContent() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Link href="/store/account/wallet" className="flex-1 text-center border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
+        <Link href={`${basePath}/account/wallet`} className="flex-1 text-center border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
           Back to Wallet
         </Link>
-        <Link href="/store/products" className="flex-1 text-center bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
+        <Link href={`${basePath}/products`} className="flex-1 text-center bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
           Start Shopping
         </Link>
       </div>

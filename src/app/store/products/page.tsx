@@ -8,6 +8,7 @@ import Footer from '@/components/store/Footer'
 import CategoryIcon from '@/components/store/CategoryIcon'
 import AnimateIn from '@/components/store/AnimateIn'
 import NewsletterCTA from '@/components/store/NewsletterCTA'
+import { useStore } from '@/providers/store-context'
 import type { Product } from '@/types/store'
 import { dbProductToProduct } from '@/lib/store/catalog-bridge'
 
@@ -15,6 +16,7 @@ export default function ProductsPage() {
   const searchParams = useSearchParams()
   const query = searchParams.get('q')?.trim().toLowerCase() || ''
   const activeCat = searchParams.get('cat') || ''
+  const { shopId, basePath } = useStore()
 
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<{ id: string; label: string; description: string }[]>([])
@@ -24,7 +26,9 @@ export default function ProductsPage() {
     let cancelled = false
     async function load() {
       try {
-        const res = await fetch('/api/store/products')
+        const params = new URLSearchParams()
+        if (shopId) params.set('shopId', shopId)
+        const res = await fetch(`/api/store/products?${params}`)
         if (!res.ok) throw new Error('Failed to fetch products')
         const { products, categories: cats } = await res.json()
 
@@ -54,7 +58,7 @@ export default function ProductsPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [])
+  }, [shopId])
 
   const activeProducts = allProducts.filter((p) => p.isActive)
 
@@ -93,11 +97,11 @@ export default function ProductsPage() {
       <main className="max-w-screen-xl mx-auto px-8 py-10">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link href="/store" className="hover:text-accent transition">Home</Link>
+          <Link href={basePath} className="hover:text-accent transition">Home</Link>
           <span>/</span>
           {activeCat ? (
             <>
-              <Link href="/store/products" className="hover:text-accent transition">Products</Link>
+              <Link href={`${basePath}/products`} className="hover:text-accent transition">Products</Link>
               <span>/</span>
               <span className="text-gray-700 font-medium">{activeCategoryLabel}</span>
             </>
@@ -112,7 +116,7 @@ export default function ProductsPage() {
             <h2 className="text-lg font-bold text-gray-900 mb-4">Product Category</h2>
             <nav className="flex flex-col">
               <Link
-                href="/store/products"
+                href={`${basePath}/products`}
                 className={`py-2.5 px-3 text-sm font-medium rounded-lg transition ${
                   !activeCat
                     ? 'text-accent bg-accent/5'
@@ -127,7 +131,7 @@ export default function ProductsPage() {
                 return (
                   <Link
                     key={cat.id}
-                    href={`/store/products?cat=${cat.id}`}
+                    href={`${basePath}/products?cat=${cat.id}`}
                     className={`py-2.5 px-3 text-sm font-medium rounded-lg transition flex items-center justify-between ${
                       activeCat === cat.id
                         ? 'text-accent bg-accent/5'
@@ -157,7 +161,7 @@ export default function ProductsPage() {
                   : `${filteredProducts.length} products`}
               </p>
               {query && (
-                <Link href="/store/products" className="text-sm text-accent font-medium hover:underline mt-2 inline-block">
+                <Link href={`${basePath}/products`} className="text-sm text-accent font-medium hover:underline mt-2 inline-block">
                   Clear search
                 </Link>
               )}
@@ -168,7 +172,7 @@ export default function ProductsPage() {
               {filteredProducts.map((product, i) => (
                 <AnimateIn key={product.id} delay={i * 60} animation="fade-up">
                 <Link
-                  href={`/store/products/${product.slug}`}
+                  href={`${basePath}/products/${product.slug}`}
                   className="group"
                 >
                   <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 mb-3">
@@ -207,7 +211,7 @@ export default function ProductsPage() {
                 </svg>
                 <p className="text-gray-400 text-lg font-medium mb-2">No products found</p>
                 <p className="text-gray-300 text-sm mb-4">Try a different search term</p>
-                <Link href="/store/products" className="text-accent text-sm font-semibold hover:underline">
+                <Link href={`${basePath}/products`} className="text-accent text-sm font-semibold hover:underline">
                   Browse all products
                 </Link>
               </div>

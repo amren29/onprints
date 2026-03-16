@@ -5,6 +5,7 @@ import type { PageSection } from '@/lib/store-builder'
 import AnimateIn from '@/components/store/AnimateIn'
 import { useMembershipStore } from '@/lib/store/membership-store'
 import { useAuthStore } from '@/lib/store/auth-store'
+import { useStore } from '@/providers/store-context'
 import { formatMYR } from '@/lib/store/pricing-engine'
 import EditableText, { type SectionEditCtx } from './EditableText'
 
@@ -22,6 +23,7 @@ export default function PricingTiersSection({ section, editMode, sectionId, onEd
   const { title, subtitle } = section.props
   const tiers = useMembershipStore((s) => s.tiers)
   const user = useAuthStore((s) => s.currentUser)
+  const { basePath } = useStore()
   const activeMembership = user?.membership && (user.membership.status ?? 'active') === 'active' && new Date(user.membership.expiryDate) > new Date() ? user.membership : null
   const ep = { editMode, sectionId, onEdit }
 
@@ -42,7 +44,7 @@ export default function PricingTiersSection({ section, editMode, sectionId, onEd
               {new Date(activeMembership.expiryDate).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
           </div>
-          <Link href="/store/products" className="px-4 py-2 bg-green-700 text-white text-sm font-semibold rounded-xl hover:bg-green-800 transition">
+          <Link href={`${basePath}/products`} className="px-4 py-2 bg-green-700 text-white text-sm font-semibold rounded-xl hover:bg-green-800 transition">
             Start Shopping
           </Link>
         </div>
@@ -72,7 +74,7 @@ export default function PricingTiersSection({ section, editMode, sectionId, onEd
                 </div>
                 {!isActive && (
                   <Link
-                    href={user ? '/store/account/membership' : '/store/auth/signin?returnTo=/store/account/membership'}
+                    href={user ? `${basePath}/account/membership` : `${basePath}/auth/signin?returnTo=${basePath}/account/membership`}
                     className="block mt-3 py-1.5 rounded-lg text-[11px] font-bold bg-current/10 hover:bg-current/20 transition text-center"
                   >
                     Subscribe

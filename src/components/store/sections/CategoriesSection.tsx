@@ -6,6 +6,7 @@ import type { PageSection } from '@/lib/store-builder'
 import AnimateIn from '@/components/store/AnimateIn'
 import CategoryIcon from '@/components/store/CategoryIcon'
 import { getStoreCategories } from '@/lib/store/catalog-bridge'
+import { useStore } from '@/providers/store-context'
 import type { ProductCategory } from '@/types/store'
 import EditableText, { type SectionEditCtx } from './EditableText'
 
@@ -24,6 +25,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 export default function CategoriesSection({ section, editMode, sectionId, onEdit }: { section: PageSection } & SectionEditCtx) {
   const title = section.props.title || 'Browse by Category'
+  const { basePath } = useStore()
   const ep = { editMode, sectionId, onEdit }
   const [categories, setCategories] = useState<{ id: ProductCategory; label: string; description: string }[]>([])
 
@@ -41,7 +43,7 @@ export default function CategoriesSection({ section, editMode, sectionId, onEdit
           const img = CATEGORY_IMAGES[cat.id]
           return (
             <AnimateIn key={cat.id} delay={i * 60} animation="scale-in">
-              <Link href={`/store/products?cat=${cat.id}`} className="group flex flex-col items-center gap-3">
+              <Link href={`${basePath}/products?cat=${cat.id}`} className="group flex flex-col items-center gap-3">
                 <div className="w-20 h-20 md:w-24 md:h-24 xl:w-28 xl:h-28 rounded-xl bg-gray-100 overflow-hidden">
                   {img ? (
                     <img src={img} alt={cat.label} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />

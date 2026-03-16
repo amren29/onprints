@@ -7,6 +7,7 @@ import Navbar from '@/components/store/Navbar'
 import Footer from '@/components/store/Footer'
 import { useAuthStore } from '@/lib/store/auth-store'
 import { useRequireAuth } from '@/lib/store/useRequireAuth'
+import { useStore } from '@/providers/store-context'
 
 type NavItem = {
   href: string
@@ -18,9 +19,10 @@ type NavItem = {
   affiliateOnly?: boolean
 }
 
-const ACCOUNT_NAV: NavItem[] = [
+// href stores relative path segments (appended to basePath + /account)
+const ACCOUNT_NAV_ITEMS: NavItem[] = [
   {
-    href: '/store/account',
+    href: '',
     label: 'Dashboard',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -33,7 +35,7 @@ const ACCOUNT_NAV: NavItem[] = [
     exact: true,
   },
   {
-    href: '/store/account/orders',
+    href: '/orders',
     label: 'Orders',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -44,7 +46,7 @@ const ACCOUNT_NAV: NavItem[] = [
     ),
   },
   {
-    href: '/store/account/affiliate',
+    href: '/affiliate',
     label: 'Affiliate',
     affiliateOnly: true,
     icon: (
@@ -54,7 +56,7 @@ const ACCOUNT_NAV: NavItem[] = [
     ),
   },
   {
-    href: '/store/account/membership',
+    href: '/membership',
     label: 'Membership',
     customerOnly: true,
     icon: (
@@ -64,7 +66,7 @@ const ACCOUNT_NAV: NavItem[] = [
     ),
   },
   {
-    href: '/store/account/wallet',
+    href: '/wallet',
     label: 'Wallet',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -73,7 +75,7 @@ const ACCOUNT_NAV: NavItem[] = [
     ),
   },
   {
-    href: '/store/account/profile',
+    href: '/profile',
     label: 'Profile',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -83,7 +85,7 @@ const ACCOUNT_NAV: NavItem[] = [
     ),
   },
   {
-    href: '/store/account/artwork',
+    href: '/artwork',
     label: 'Artwork',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -94,7 +96,7 @@ const ACCOUNT_NAV: NavItem[] = [
     ),
   },
   {
-    href: '/store/account/addresses',
+    href: '/addresses',
     label: 'Addresses',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -110,6 +112,13 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const { user, isLoading } = useRequireAuth()
   const signOut = useAuthStore((s) => s.signOut)
   const clearMembership = useAuthStore((s) => s.clearMembership)
+  const { basePath } = useStore()
+
+  // Build nav items with full hrefs based on basePath
+  const ACCOUNT_NAV = ACCOUNT_NAV_ITEMS.map((item) => ({
+    ...item,
+    href: `${basePath}/account${item.href}`,
+  }))
 
   // Re-sync from localStorage on each navigation
   // (picks up admin-side role changes like demote/promote)

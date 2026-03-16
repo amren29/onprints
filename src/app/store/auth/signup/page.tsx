@@ -11,12 +11,14 @@ import Button from '@/components/store/ui/Button'
 import { useAuthStore } from '@/lib/store/auth-store'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
 import { upsertOnlineCustomer } from '@/lib/store/customer-bridge'
+import { useStore } from '@/providers/store-context'
 
 export default function SignUpPage() {
   const router = useRouter()
   const signUp = useAuthStore((s) => s.signUp)
   const currentUser = useAuthStore((s) => s.currentUser)
   const globalSettings = useStoreGlobal()
+  const { basePath } = useStore()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -27,7 +29,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (currentUser) router.replace('/store/account')
+    if (currentUser) router.replace(`${basePath}/account`)
   }, [currentUser, router])
 
   const validate = () => {
@@ -53,7 +55,7 @@ export default function SignUpPage() {
       const result = signUp(name.trim(), email.trim(), password)
       if (result.success) {
         upsertOnlineCustomer({ name: name.trim(), email: email.trim(), phone: '', company: '' }, 0)
-        router.push('/store/account')
+        router.push(`${basePath}/account`)
       } else {
         setGlobalError(result.error || 'Sign up failed')
       }
@@ -125,7 +127,7 @@ export default function SignUpPage() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{' '}
-            <Link href="/store/auth/signin" className="text-accent font-semibold hover:underline">
+            <Link href={`${basePath}/auth/signin`} className="text-accent font-semibold hover:underline">
               Sign in
             </Link>
           </p>

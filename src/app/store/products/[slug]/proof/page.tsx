@@ -15,6 +15,7 @@ import { useCanvaTokensFromCookie } from '@/lib/store/use-canva-tokens'
 import Navbar from '@/components/store/Navbar'
 import ProofingCanvas from '@/components/store/artwork/ProofingCanvas'
 import CanvaDesignPicker from '@/components/store/canva/CanvaDesignPicker'
+import { useStore } from '@/providers/store-context'
 
 const ACCEPTED_EXTS = '.jpg,.jpeg,.png,.pdf,.ai,.eps,.svg,.cdr,.zip,.rar'
 const MAX_SIZE_MB = 50
@@ -63,6 +64,7 @@ function parseSizeMm(sizeStr: string): { w: number; h: number } | null {
 export default function ProofPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const searchParams = useSearchParams()
+  const { basePath } = useStore()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -97,7 +99,7 @@ export default function ProofPage({ params }: { params: Promise<{ slug: string }
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-lg font-semibold text-gray-500 mb-2">Product not found</p>
-            <Link href="/store/products" className="text-accent hover:underline">Browse Products</Link>
+            <Link href={`${basePath}/products`} className="text-accent hover:underline">Browse Products</Link>
           </div>
         </div>
       </div>
@@ -158,6 +160,7 @@ function ProofPageContent({
   canvaDesignId?: string
 }) {
   const router = useRouter()
+  const { basePath } = useStore()
   const addItem = useCartStore((s) => s.addItem)
   const currentUser = useAuthStore((s) => s.currentUser)
   const addSavedArtwork = useAuthStore((s) => s.addSavedArtwork)
@@ -315,7 +318,7 @@ function ProofPageContent({
       artworkFileName: file.name,
       artworkUrl: imageUrl,
     })
-    router.push('/store/cart')
+    router.push(`${basePath}/cart`)
   }
 
   const canvaConfigured = !!process.env.NEXT_PUBLIC_CANVA_CLIENT_ID
@@ -329,11 +332,11 @@ function ProofPageContent({
       return
     }
     if (!currentUser) {
-      window.location.href = `/store/auth/signin?returnTo=/store/products/${slug}/proof`
+      window.location.href = `${basePath}/auth/signin?returnTo=${basePath}/products/${slug}/proof`
       return
     }
     if (!currentUser.canvaTokens?.accessToken || currentUser.canvaTokens.expiresAt < Date.now()) {
-      window.location.href = `/api/store/canva/authorize?returnTo=/store/products/${slug}/proof`
+      window.location.href = `/api/store/canva/authorize?returnTo=${basePath}/products/${slug}/proof`
       return
     }
     setCanvaPickerOpen(true)
@@ -382,9 +385,9 @@ function ProofPageContent({
           <div className="bg-white border-b border-gray-200">
             <div className="max-w-screen-xl mx-auto px-4 sm:px-8 py-4">
               <nav className="text-xs text-gray-400 mb-2 flex items-center gap-1.5">
-                <Link href="/store/products" className="hover:text-accent transition">Products</Link>
+                <Link href={`${basePath}/products`} className="hover:text-accent transition">Products</Link>
                 <span>&gt;</span>
-                <Link href={`/store/products/${slug}`} className="hover:text-accent transition">{productName}</Link>
+                <Link href={`${basePath}/products/${slug}`} className="hover:text-accent transition">{productName}</Link>
                 <span>&gt;</span>
                 <span className="text-gray-700 font-medium">Upload Artwork</span>
               </nav>
@@ -405,7 +408,7 @@ function ProofPageContent({
                   )}
                 </div>
                 <Link
-                  href={`/store/products/${slug}`}
+                  href={`${basePath}/products/${slug}`}
                   className="text-sm text-accent hover:underline flex items-center gap-1"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

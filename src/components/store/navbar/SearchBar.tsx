@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getStoreProducts } from '@/lib/store/catalog-bridge'
 import CategoryIcon from '@/components/store/CategoryIcon'
+import { useStore } from '@/providers/store-context'
 import type { Product } from '@/types/store'
 
 interface SearchBarProps {
@@ -17,6 +18,7 @@ export default function SearchBar({ autoFocus, onNavigate }: SearchBarProps) {
   const [focused, setFocused] = useState(false)
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const router = useRouter()
+  const { basePath } = useStore()
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -40,7 +42,7 @@ export default function SearchBar({ autoFocus, onNavigate }: SearchBarProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (query.trim()) {
-      router.push(`/store/products?q=${encodeURIComponent(query.trim())}`)
+      router.push(`${basePath}/products?q=${encodeURIComponent(query.trim())}`)
       setFocused(false)
       inputRef.current?.blur()
       onNavigate?.()
@@ -48,7 +50,7 @@ export default function SearchBar({ autoFocus, onNavigate }: SearchBarProps) {
   }
 
   function handleSelect(slug: string) {
-    router.push(`/store/products/${slug}`)
+    router.push(`${basePath}/products/${slug}`)
     setQuery('')
     setFocused(false)
     onNavigate?.()
@@ -111,7 +113,7 @@ export default function SearchBar({ autoFocus, onNavigate }: SearchBarProps) {
             </button>
           ))}
           <Link
-            href={`/store/products?q=${encodeURIComponent(query.trim())}`}
+            href={`${basePath}/products?q=${encodeURIComponent(query.trim())}`}
             onClick={() => {
               setFocused(false)
               onNavigate?.()

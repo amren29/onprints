@@ -7,7 +7,7 @@ import AppShell from '@/components/AppShell'
 import CreateToast from '@/components/CreateToast'
 import DateRangePicker from '@/components/DateRangePicker'
 import ConfirmModal from '@/components/ConfirmModal'
-import { getPayments, updatePayment, deletePayment, type DbPayment } from '@/lib/db/payments'
+import type { DbPayment } from '@/lib/db/payments'
 import StatusSelect from '@/components/StatusSelect'
 import { printDocument, docHeader, docFooter, fields2, fields3, section, textBlock, badgeColors } from '@/lib/print-utils'
 import Pagination, { usePagination } from '@/components/Pagination'
@@ -60,15 +60,26 @@ export default function PaymentsPage() {
   const { shopId } = useShop()
   const qc = useQueryClient()
 
-  const { data: payments = [] } = useQuery({
+  const { data: payments = [] } = useQuery<DbPayment[]>({
     queryKey: ['payments', shopId],
-    queryFn: () => getPayments(shopId),
+    queryFn: async () => {
+      const res = await fetch(`/api/payments?shopId=${shopId}`)
+      if (!res.ok) throw new Error('Failed to load payments')
+      return res.json()
+    },
     enabled: !!shopId,
   })
 
   const updateMut = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updatePayment>[2] }) =>
-      updatePayment(shopId, id, updates),
+    mutationFn: async ({ id, updates }: { id: string; updates: Record<string, unknown> }) => {
+      const res = await fetch(`/api/payments?shopId=${shopId}&id=${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Failed to update') }
+      return res.json()
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['payments', shopId] }),
     onError: (err: any) => {
       console.error('[updatePayment]', err)
@@ -77,7 +88,11 @@ export default function PaymentsPage() {
   })
 
   const deleteMut = useMutation({
-    mutationFn: (id: string) => deletePayment(shopId, id),
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/payments?shopId=${shopId}&id=${id}`, { method: 'DELETE' })
+      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Failed to delete') }
+      return res.json()
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['payments', shopId] }),
     onError: (err: any) => {
       console.error('[deletePayment]', err)

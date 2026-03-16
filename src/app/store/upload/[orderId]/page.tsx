@@ -7,6 +7,7 @@ import ProofingCanvas from '@/components/store/artwork/ProofingCanvas'
 import { getStoreProductBySlug } from '@/lib/store/catalog-bridge'
 import { ArtworkAnalysis, PrintSpecs, Product } from '@/types/store'
 import { analyzeArtwork, isPDFFile } from '@/lib/store/artwork-utils'
+import { useStore } from '@/providers/store-context'
 
 const ACCEPTED_EXTS = '.jpg,.jpeg,.png,.pdf,.ai,.eps,.svg,.cdr,.zip,.rar'
 const MAX_SIZE_MB = 50
@@ -25,6 +26,7 @@ type Step = 'upload' | 'finalize' | 'review'
 export default function UploadPage({ params }: { params: Promise<{ orderId: string }> }) {
   const { orderId } = use(params)
   const router = useRouter()
+  const { basePath } = useStore()
   const searchParams = useSearchParams()
   const productSlug = searchParams.get('product') ?? ''
   const [product, setProduct] = useState<Product | null>(null)
@@ -103,7 +105,7 @@ export default function UploadPage({ params }: { params: Promise<{ orderId: stri
 
   function handleApprove() {
     setApproved(true)
-    setTimeout(() => router.push('/store/cart'), 1500)
+    setTimeout(() => router.push(`${basePath}/cart`), 1500)
   }
 
   if (approved) {

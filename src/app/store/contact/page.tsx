@@ -5,15 +5,19 @@ import Navbar from '@/components/store/Navbar'
 import Footer from '@/components/store/Footer'
 import { PageRenderer } from '@/components/store/sections'
 import { type PageSection, DEFAULT_PAGE_SECTIONS } from '@/lib/store-builder'
+import { useStore } from '@/providers/store-context'
 
 export default function ContactPage() {
+  const { shopId } = useStore()
   const [sections, setSections] = useState<PageSection[]>([])
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
-        const res = await fetch('/api/store/pages?pageId=contact')
+        const params = new URLSearchParams({ pageId: 'contact' })
+        if (shopId) params.set('shopId', shopId)
+        const res = await fetch(`/api/store/pages?${params}`)
         const { page } = await res.json()
         if (!cancelled) {
           setSections((page?.sections as PageSection[]) ?? DEFAULT_PAGE_SECTIONS.contact())
@@ -24,7 +28,7 @@ export default function ContactPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [])
+  }, [shopId])
 
   if (!sections.length) {
     return (

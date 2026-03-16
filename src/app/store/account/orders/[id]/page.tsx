@@ -12,6 +12,7 @@ import { ProductionStatus } from '@/types/store'
 import { updateOrder as updateDbOrder, getOrderById as getDbOrderById } from '@/lib/db/orders'
 // TODO [Batch G]: Replace notification-store with Supabase
 import { addNotification } from '@/lib/notification-store'
+import { useStore } from '@/providers/store-context'
 
 const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID!
 
@@ -20,6 +21,7 @@ const PROD_STEPS: ProductionStatus[] = ['Queued', 'In Progress', 'Quality Check'
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
+  const { basePath } = useStore()
   const user = useAuthStore((s) => s.currentUser)
   const updateOrderStatus = useAuthStore((s) => s.updateOrderStatus)
   const cartItems = useCartStore((s) => s.items)
@@ -37,7 +39,7 @@ export default function OrderDetailPage() {
   if (!order) {
     return (
       <div className="space-y-4">
-        <Link href="/store/account/orders" className="text-sm text-accent hover:underline">
+        <Link href={`${basePath}/account/orders`} className="text-sm text-accent hover:underline">
           &larr; Back to Orders
         </Link>
         <div className="bg-white rounded-2xl border border-gray-100 px-6 py-16 text-center">
@@ -67,7 +69,7 @@ export default function OrderDetailPage() {
 
     if (result.added > 0) {
       setReorderNotice(messages.join('. '))
-      setTimeout(() => router.push('/store/cart'), 1500)
+      setTimeout(() => router.push(`${basePath}/cart`), 1500)
     } else {
       setReorderNotice(messages.join('. ') || 'No items could be reordered')
     }
@@ -149,7 +151,7 @@ export default function OrderDetailPage() {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-400">
-        <Link href="/store/account/orders" className="hover:text-accent transition">Orders</Link>
+        <Link href={`${basePath}/account/orders`} className="hover:text-accent transition">Orders</Link>
         <span>/</span>
         <span className="text-gray-900 font-medium">{order.id}</span>
       </div>

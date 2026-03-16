@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import type { Banner } from '@/config/store/banners'
+import { useStore } from '@/providers/store-context'
 
 interface Slide {
   id: string
@@ -15,34 +16,36 @@ interface Slide {
   bgImage?: string
 }
 
-const SLIDES: Slide[] = [
-  {
-    id: 'hero',
-    badge: 'Professional Printing',
-    heading: 'Print smarter.\nGrow faster.',
-    subheading: 'Business cards, banners, flyers and more — with instant pricing, online artwork proofing, and fast delivery across Malaysia.',
-    cta: { label: 'Browse Products', href: '/store/products' },
-    secondaryCta: { label: 'Join Membership', href: '/store/membership' },
-    bgGradient: 'linear-gradient(135deg, #0a0f1e 0%, #1a1f3a 40%, #0d2847 70%, #0a0f1e 100%)',
-  },
-  {
-    id: 'how-to-order',
-    badge: 'How to Order',
-    heading: 'From screen to print\nin 4 simple steps',
-    subheading: 'Choose your product, upload artwork, pay securely, and we print & deliver — with real-time proofing so you know exactly what you\'ll get.',
-    cta: { label: 'Learn More', href: '/store/how-to-order' },
-    secondaryCta: { label: 'Start Ordering', href: '/store/products' },
-    bgGradient: 'linear-gradient(135deg, #001233 0%, #001845 40%, #023e7d 70%, #001233 100%)',
-  },
-  {
-    id: 'membership',
-    badge: 'Save More',
-    heading: 'Join our\nmembership program',
-    subheading: 'Get up to 15% off every order with a yearly membership. Five tiers to suit every business — from startups to enterprises.',
-    cta: { label: 'View Plans', href: '/store/membership' },
-    bgGradient: 'linear-gradient(135deg, #0a0f1e 0%, #1b2838 40%, #0f2027 70%, #0a0f1e 100%)',
-  },
-]
+function getSlides(basePath: string): Slide[] {
+  return [
+    {
+      id: 'hero',
+      badge: 'Professional Printing',
+      heading: 'Print smarter.\nGrow faster.',
+      subheading: 'Business cards, banners, flyers and more — with instant pricing, online artwork proofing, and fast delivery across Malaysia.',
+      cta: { label: 'Browse Products', href: `${basePath}/products` },
+      secondaryCta: { label: 'Join Membership', href: `${basePath}/membership` },
+      bgGradient: 'linear-gradient(135deg, #0a0f1e 0%, #1a1f3a 40%, #0d2847 70%, #0a0f1e 100%)',
+    },
+    {
+      id: 'how-to-order',
+      badge: 'How to Order',
+      heading: 'From screen to print\nin 4 simple steps',
+      subheading: 'Choose your product, upload artwork, pay securely, and we print & deliver — with real-time proofing so you know exactly what you\'ll get.',
+      cta: { label: 'Learn More', href: `${basePath}/how-to-order` },
+      secondaryCta: { label: 'Start Ordering', href: `${basePath}/products` },
+      bgGradient: 'linear-gradient(135deg, #001233 0%, #001845 40%, #023e7d 70%, #001233 100%)',
+    },
+    {
+      id: 'membership',
+      badge: 'Save More',
+      heading: 'Join our\nmembership program',
+      subheading: 'Get up to 15% off every order with a yearly membership. Five tiers to suit every business — from startups to enterprises.',
+      cta: { label: 'View Plans', href: `${basePath}/membership` },
+      bgGradient: 'linear-gradient(135deg, #0a0f1e 0%, #1b2838 40%, #0f2027 70%, #0a0f1e 100%)',
+    },
+  ]
+}
 
 const INTERVAL = 6000
 
@@ -51,10 +54,12 @@ interface HeroBannerProps {
 }
 
 export default function HeroBanner({ banner }: HeroBannerProps) {
+  const { basePath } = useStore()
   const [current, setCurrent] = useState(0)
   const [paused, setPaused] = useState(false)
 
   // Override first slide bg with active banner config
+  const SLIDES = getSlides(basePath)
   const slides = SLIDES.map((s, i) =>
     i === 0 ? { ...s, bgGradient: banner.bgGradient, bgImage: banner.bgImage } : s
   )

@@ -9,6 +9,7 @@ import Footer from '@/components/store/Footer'
 import { useAuthStore } from '@/lib/store/auth-store'
 // TODO [Batch G]: Replace membership-store with Supabase
 import { useMembershipStore } from '@/lib/store/membership-store'
+import { useStore } from '@/providers/store-context'
 
 export default function MembershipSuccessPage() {
   return (
@@ -19,6 +20,7 @@ export default function MembershipSuccessPage() {
 }
 
 function MembershipSuccessContent() {
+  const { basePath } = useStore()
   const params = useSearchParams()
   const billplzId = params.get('billplz_id')
   const isBankTransfer = params.get('method') === 'bank-transfer'
@@ -160,7 +162,7 @@ function MembershipSuccessContent() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment Issue</h1>
           <p className="text-gray-500 mb-6">{error}</p>
-          <Link href="/store/account/membership" className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
+          <Link href={`${basePath}/account/membership`} className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
             Try Again
           </Link>
         </main>
@@ -185,10 +187,10 @@ function MembershipSuccessContent() {
             Your bank transfer receipt has been submitted. Your membership will be activated once our admin team verifies payment.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/store/account/membership" className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
+            <Link href={`${basePath}/account/membership`} className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
               Back to Membership
             </Link>
-            <Link href="/store/products" className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
+            <Link href={`${basePath}/products`} className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
               Browse Products
             </Link>
           </div>
@@ -219,10 +221,10 @@ function MembershipSuccessContent() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/store/account" className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
+          <Link href={`${basePath}/account`} className="border-2 border-accent text-accent font-bold px-6 py-3 rounded-xl hover:bg-accent/5 transition">
             Go to Dashboard
           </Link>
-          <Link href="/store/products" className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
+          <Link href={`${basePath}/products`} className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition">
             Start Shopping
           </Link>
         </div>

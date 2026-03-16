@@ -22,6 +22,7 @@ import { createAffiliateOrder, getAffiliates, initFinanceData, createAffiliatePa
 import { creditStoreUserWallet, getStoreUserByAffiliateCode } from '@/lib/store/auth-store'
 import { fetchStoreSettings, type StoreSettings, DEFAULTS as SETTINGS_DEFAULTS } from '@/lib/store-settings-store'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
+import { useStore } from '@/providers/store-context'
 
 const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID!
 
@@ -106,6 +107,7 @@ export default function CheckoutPage() {
   const addOrder = useAuthStore((s) => s.addOrder)
   const debitWallet = useAuthStore((s) => s.debitWallet)
   const globalSettings = useStoreGlobal()
+  const { basePath } = useStore()
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(SETTINGS_DEFAULTS)
   const [settingsLoaded, setSettingsLoaded] = useState(false)
 
@@ -198,7 +200,7 @@ export default function CheckoutPage() {
         <Navbar />
         <main className="max-w-lg mx-auto px-4 py-20 text-center">
           <p className="text-gray-500 mb-4">Your cart is empty.</p>
-          <Link href="/store/products" className="text-accent font-semibold hover:underline">Browse products</Link>
+          <Link href={`${basePath}/products`} className="text-accent font-semibold hover:underline">Browse products</Link>
         </main>
         <Footer />
       </>
@@ -385,7 +387,7 @@ export default function CheckoutPage() {
       }
       clearCart()
       removeCurrentSession()
-      router.push(`/store/order-success?id=${orderId}&email=${encodeURIComponent(contact.email)}&total=${total.toFixed(2)}&method=wallet`)
+      router.push(`${basePath}/order-success?id=${orderId}&email=${encodeURIComponent(contact.email)}&total=${total.toFixed(2)}&method=wallet`)
     } else if (payment === 'online') {
       // ── Billplz Checkout flow ──────────────────────────────────
       try {
@@ -570,7 +572,7 @@ export default function CheckoutPage() {
 
       clearCart()
       removeCurrentSession()
-      router.push(`/store/order-success?id=${orderId}&email=${encodeURIComponent(contact.email)}&total=${total.toFixed(2)}&method=transfer&adminId=${adminOrder.id}`)
+      router.push(`${basePath}/order-success?id=${orderId}&email=${encodeURIComponent(contact.email)}&total=${total.toFixed(2)}&method=transfer&adminId=${adminOrder.id}`)
       } catch (err) {
 
         setPlacing(false)
@@ -975,7 +977,7 @@ export default function CheckoutPage() {
             </button>
             <p className="text-center text-xs text-gray-400 mt-3">
               By placing your order you agree to our{' '}
-              <Link href="/store/terms" className="underline hover:text-accent transition">Terms & Conditions</Link>
+              <Link href={`${basePath}/terms`} className="underline hover:text-accent transition">Terms & Conditions</Link>
             </p>
           </div>
         </div>

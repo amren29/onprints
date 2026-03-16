@@ -10,12 +10,14 @@ import Button from '@/components/store/ui/Button'
 // TODO [Batch G]: Replace auth-store with Supabase store-users
 import { useAuthStore } from '@/lib/store/auth-store'
 import { useStoreGlobal } from '@/hooks/useStoreGlobal'
+import { useStore } from '@/providers/store-context'
 
 export default function SignInPage() {
   const router = useRouter()
   const signIn = useAuthStore((s) => s.signIn)
   const currentUser = useAuthStore((s) => s.currentUser)
   const globalSettings = useStoreGlobal()
+  const { basePath } = useStore()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,7 +26,7 @@ export default function SignInPage() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (currentUser) router.replace('/store/account')
+    if (currentUser) router.replace(`${basePath}/account`)
   }, [currentUser, router])
 
   const handleSubmit = (e: FormEvent) => {
@@ -41,7 +43,7 @@ export default function SignInPage() {
     setTimeout(() => {
       const result = signIn(email, password)
       if (result.success) {
-        router.push('/store/account')
+        router.push(`${basePath}/account`)
       } else {
         setError(result.error || 'Sign in failed')
       }
@@ -91,7 +93,7 @@ export default function SignInPage() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Don&apos;t have an account?{' '}
-            <Link href="/store/auth/signup" className="text-accent font-semibold hover:underline">
+            <Link href={`${basePath}/auth/signup`} className="text-accent font-semibold hover:underline">
               Sign up
             </Link>
           </p>

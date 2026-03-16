@@ -6,7 +6,7 @@ import Link from 'next/link'
 import AppShell from '@/components/AppShell'
 import ConfirmModal from '@/components/ConfirmModal'
 import SavingOverlay from '@/components/SavingOverlay'
-import { getPaymentById, updatePayment, deletePayment, type DbPayment } from '@/lib/db/payments'
+import type { DbPayment } from '@/lib/db/payments'
 import CustomSelect from '@/components/CustomSelect'
 import { useShop } from '@/providers/shop-provider'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -30,14 +30,27 @@ export default function PaymentDetailPage() {
   const { shopId } = useShop()
   const qc = useQueryClient()
 
-  const { data: pay, isLoading } = useQuery({
+  const { data: pay, isLoading } = useQuery<DbPayment | null>({
     queryKey: ['payment', shopId, id],
-    queryFn: () => getPaymentById(shopId, id),
+    queryFn: async () => {
+      const res = await fetch(`/api/payments?shopId=${shopId}`)
+      if (!res.ok) throw new Error('Failed to load payment')
+      const all: DbPayment[] = await res.json()
+      return all.find(p => p.id === id) ?? null
+    },
     enabled: !!shopId && !!id,
   })
 
   const updateMut = useMutation({
-    mutationFn: (updates: Parameters<typeof updatePayment>[2]) => updatePayment(shopId, id, updates),
+    mutationFn: async (updates: Record<string, unknown>) => {
+      const res = await fetch(`/api/payments?shopId=${shopId}&id=${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Failed to update') }
+      return res.json()
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['payment', shopId, id] })
       qc.invalidateQueries({ queryKey: ['payments', shopId] })
@@ -50,7 +63,11 @@ export default function PaymentDetailPage() {
   })
 
   const deleteMut = useMutation({
-    mutationFn: () => deletePayment(shopId, id),
+    mutationFn: async () => {
+      const res = await fetch(`/api/payments?shopId=${shopId}&id=${id}`, { method: 'DELETE' })
+      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Failed to delete') }
+      return res.json()
+    },
     onSuccess: () => router.push('/payments'),
     onError: (err: any) => {
       console.error('[deletePayment]', err)
