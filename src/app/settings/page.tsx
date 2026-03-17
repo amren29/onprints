@@ -10,6 +10,7 @@ import { getStoreSettings, saveStoreSettings } from '@/lib/db/storefront'
 import { saveNotifPrefs } from '@/lib/db/notifications'
 import { useShop } from '@/providers/shop-provider'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
 
 /* ── ICONS ──────────────────────────────────────────── */
 const UserIcon = () => (
@@ -427,13 +428,37 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
 /* ── SECTION COMPONENTS ──────────────────────────────── */
 
 function AccountSection({ onSave }: { onSave: (msg: string) => void }) {
-  const [name, setName]   = useState('Ahmad Zawawi')
-  const [email, setEmail] = useState('ahmad@saasprint.my')
-  const [phone, setPhone] = useState('+60 12-388 4411')
+  const [name, setName]   = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleteText, setDeleteText] = useState('')
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setName(data.user.user_metadata?.name || '')
+        setEmail(data.user.email || '')
+        setPhone(data.user.user_metadata?.phone || '')
+      }
+    })
+  }, [])
+
+  const handleSaveAccount = async () => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.updateUser({ data: { name, phone } })
+      if (error) { alert('Failed to save: ' + error.message); return }
+      onSave('Account saved')
+    } catch (err) {
+      console.error('Failed to save account:', err)
+    }
+  }
+
+  const avatarInitials = name.trim().split(/\s+/).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('') || '?'
 
   return (
     <div>
@@ -445,14 +470,14 @@ function AccountSection({ onSave }: { onSave: (msg: string) => void }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
             <div style={{ position: 'relative' }}>
               <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--info-bg)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, border: '2px solid var(--accent)' }}>
-                AZ
+                {avatarInitials}
               </div>
               <button style={{ position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: '50%', background: 'var(--accent)', border: '2px solid var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff', transition: 'transform 0.15s ease' }}>
                 <CameraIcon />
               </button>
             </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Ahmad Zawawi</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{name || 'No name set'}</div>
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>JPG, PNG or GIF · Max 2MB</div>
               <button className="btn-secondary" style={{ fontSize: 12, padding: '6px 14px' }}>Upload Photo</button>
             </div>
@@ -473,11 +498,11 @@ function AccountSection({ onSave }: { onSave: (msg: string) => void }) {
             </label>
             <label className="form-group" style={{ gridColumn: '1 / -1' }}>
               <span className="form-label" style={formLabel}>Email Address</span>
-              <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ padding: '10px 12px' }} />
+              <input className="form-input" type="email" value={email} disabled style={{ padding: '10px 12px', opacity: 0.6 }} />
             </label>
           </div>
           <div style={footerBar}>
-            <button className="btn-primary" onClick={() => onSave('Account saved')}>Save Changes</button>
+            <button className="btn-primary" onClick={handleSaveAccount}>Save Changes</button>
           </div>
         </div>
 

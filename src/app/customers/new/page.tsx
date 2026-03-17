@@ -36,7 +36,8 @@ export default function NewCustomerPage() {
 
   const handleCreate = async () => {
     setTried(true)
-    if (!name.trim() || saving || !shopId) return
+    if (!shopId) { alert('Shop not ready. Please refresh the page.'); return }
+    if (!name.trim() || saving) return
     setSaving(true)
     try {
       await createCustomer(shopId, {

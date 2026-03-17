@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import AppShell from '@/components/AppShell'
@@ -9,6 +9,7 @@ import { getOrders, type DbOrder } from '@/lib/db/orders'
 import { getPayments } from '@/lib/db/payments'
 import { getStockItems } from '@/lib/db/inventory'
 import { getStoreSettings } from '@/lib/db/storefront'
+import { getProducts } from '@/lib/db/catalog'
 import { useShop } from '@/providers/shop-provider'
 import { useQuery } from '@tanstack/react-query'
 
@@ -211,24 +212,8 @@ const CheckIcon = () => (
   </svg>
 )
 
-function WelcomeBanner({ storeName, onDismiss }: { storeName: string; onDismiss: () => void }) {
+function WelcomeBanner({ storeName, onDismiss, completed }: { storeName: string; onDismiss: () => void; completed: string[] }) {
   const router = useRouter()
-  const [completed, setCompleted] = useState<string[]>([])
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('sp_checklist_done')
-      if (raw) setCompleted(JSON.parse(raw))
-    } catch { /* ignore */ }
-  }, [])
-
-  const toggleItem = useCallback((key: string) => {
-    setCompleted(prev => {
-      const next = prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
-      localStorage.setItem('sp_checklist_done', JSON.stringify(next))
-      return next
-    })
-  }, [])
 
   const progress = Math.round((completed.length / CHECKLIST_ITEMS.length) * 100)
 
@@ -293,20 +278,19 @@ function WelcomeBanner({ storeName, onDismiss }: { storeName: string; onDismiss:
               onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover, #f8fafc)'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
-              {/* Checkbox */}
-              <button
-                onClick={e => { e.stopPropagation(); toggleItem(item.key) }}
+              {/* Status indicator */}
+              <div
                 style={{
                   width: 22, height: 22, borderRadius: 6, flexShrink: 0,
                   border: done ? 'none' : '2px solid var(--border, #d1d5db)',
                   background: done ? 'var(--accent, #006AFF)' : 'transparent',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: '#fff', padding: 0,
+                  color: '#fff', padding: 0,
                   transition: 'background 0.15s, border 0.15s',
                 }}
               >
                 {done && <CheckIcon />}
-              </button>
+              </div>
               {/* Text */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
@@ -362,7 +346,24 @@ export default function DashboardPage() {
     enabled: !!shopId,
   })
 
+  const { data: products = [] } = useQuery({
+    queryKey: ['products', shopId],
+    queryFn: () => getProducts(shopId),
+    enabled: !!shopId,
+  })
+
   const storeName = (storeSettings as Record<string, unknown>)?.store_name as string ?? ''
+
+  // Compute checklist from real DB data
+  const checklistCompleted = useMemo(() => {
+    const done: string[] = []
+    if (products.length > 0) done.push('product')
+    if (orders.length > 0) done.push('order')
+    if (storeName) done.push('store')
+    if (payments.length > 0) done.push('payment')
+    if (stockItems.length > 0) done.push('stock')
+    return done
+  }, [products, orders, storeName, payments, stockItems])
   const alertCount = stockItems.filter(s => s.status === 'Low' || s.status === 'Critical').length
   const wallet = payments.map(p => ({ type: p.status === 'Paid' ? 'credit' : 'debit', amount: p.amount_paid, date: p.date }))
 
@@ -464,6 +465,7 @@ export default function DashboardPage() {
         {showWelcome && (
           <WelcomeBanner
             storeName={storeName}
+            completed={checklistCompleted}
             onDismiss={() => {
               setShowWelcome(false)
               localStorage.removeItem('sp_show_welcome')

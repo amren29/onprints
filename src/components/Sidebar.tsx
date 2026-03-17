@@ -12,6 +12,7 @@ import {
 } from '@/lib/db/production'
 import { getStockItems } from '@/lib/db/inventory'
 import { getUnreadCount } from '@/lib/db/notifications'
+import { createClient } from '@/lib/supabase/client'
 
 /* ── ICONS ─────────────────────────────────────────── */
 const Icon = {
@@ -187,6 +188,38 @@ export default function Sidebar() {
   const urlBoardId  = searchParams.get('board') ?? ''
   const { shopId, shop } = useShop()
   const qc = useQueryClient()
+
+  const [userName, setUserName] = useState('')
+  const [userEmail, setUserEmail] = useState('')
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUserName(data.user.user_metadata?.name || '')
+        setUserEmail(data.user.email || '')
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!showUserMenu) return
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showUserMenu])
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -573,12 +606,41 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="sidebar-footer">
-        <div className="user-profile">
-          <div className="user-avatar">{(shop?.name || 'A').slice(0, 2).toUpperCase()}</div>
+      <div className="sidebar-footer" style={{ position: 'relative' }} ref={userMenuRef}>
+        {showUserMenu && (
+          <div style={{
+            position: 'absolute',
+            bottom: 'calc(100% + 4px)',
+            left: 8,
+            right: 8,
+            background: 'var(--bg-card)',
+            borderRadius: 8,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+            border: '1px solid var(--border)',
+            zIndex: 200,
+            padding: 4,
+          }}>
+            <button
+              onClick={handleLogout}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+                padding: '8px 12px', borderRadius: 6, fontSize: 12.5, fontWeight: 500,
+                color: 'var(--negative)', background: 'transparent', border: 'none',
+                cursor: 'pointer', fontFamily: 'var(--font)', textAlign: 'left',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Log out
+            </button>
+          </div>
+        )}
+        <div className="user-profile" onClick={() => setShowUserMenu(v => !v)} style={{ cursor: 'pointer' }}>
+          <div className="user-avatar">{(userName || userEmail || 'A').slice(0, 2).toUpperCase()}</div>
           <div className="user-info">
-            <div className="user-name">{shop?.name || 'Admin'}</div>
-            <div className="user-email">{shop?.slug || 'admin'}</div>
+            <div className="user-name">{userName || userEmail || 'User'}</div>
+            <div className="user-email">{shop?.name || 'My Shop'}</div>
           </div>
           <span className="user-chevron"><Icon.Chevrons /></span>
         </div>

@@ -8,6 +8,7 @@ interface ShopContext {
   role: string
   shop: any
   isLoading: boolean
+  error: string
 }
 
 const ShopCtx = createContext<ShopContext>({
@@ -15,6 +16,7 @@ const ShopCtx = createContext<ShopContext>({
   role: '',
   shop: null,
   isLoading: true,
+  error: '',
 })
 
 export function ShopProvider({ children }: { children: ReactNode }) {
@@ -23,6 +25,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     role: '',
     shop: null,
     isLoading: true,
+    error: '',
   })
 
   const initRef = useRef(false)
@@ -47,6 +50,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
             role: result.role,
             shop: result.shop,
             isLoading: false,
+            error: '',
           })
           return
         }
@@ -56,7 +60,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         const created = await createShop({ name: 'My Print Shop' })
         if (created.error) {
           console.error('[ShopProvider] Failed to create shop:', created.error)
-          setState((s) => ({ ...s, isLoading: false }))
+          setState((s) => ({ ...s, isLoading: false, error: `Shop creation failed: ${created.error}` }))
           return
         }
         if (created.shop) {
@@ -66,11 +70,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
             role: 'owner',
             shop: created.shop,
             isLoading: false,
+            error: '',
           })
         }
       } catch (err) {
         console.error('[ShopProvider] Error:', err)
-        setState((s) => ({ ...s, isLoading: false }))
+        setState((s) => ({ ...s, isLoading: false, error: `Shop init failed: ${err instanceof Error ? err.message : String(err)}` }))
       }
     }
     init()

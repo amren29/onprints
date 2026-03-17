@@ -68,6 +68,7 @@ export default function NewPaymentPage() {
 
   const handleCreate = () => {
     setTried(true)
+    if (!shopId) { alert('Shop not ready. Please refresh the page.'); return }
     if (!client.trim() || saving) return
     setSaving(true)
     setTimeout(() => {
