@@ -126,6 +126,6 @@ export const useCartStore = create<CartStore>()(
         return { added: newCartItems.length, skipped, priceChanged }
       },
     }),
-    { name: 'saasprint-cart' }
+    { name: 'onprints-cart' }
   )
 )

@@ -6,7 +6,7 @@ import './globals.css'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'SaasPrint',
+  title: 'OnPrints',
   description: 'Print shop management',
 }
 

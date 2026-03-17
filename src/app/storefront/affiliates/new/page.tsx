@@ -64,7 +64,7 @@ export default function NewAffiliatePage() {
 
   return (
     <MyStoreShell>
-      {createMut.isPending && <SavingOverlay message="Creating affiliate..." />}
+      {createMut.isPending && <SavingOverlay message="Creating affiliate…" />}
 
       <div className="page-header">
         <Link href="/storefront/affiliates" className="back-btn"><BackIcon /> Affiliates</Link>

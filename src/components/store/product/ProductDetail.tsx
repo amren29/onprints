@@ -15,7 +15,6 @@ import AnimateIn from '@/components/store/AnimateIn'
 import CanvaDesignPicker from '@/components/store/canva/CanvaDesignPicker'
 import StorefrontVariantBuilder, { type VariantBuilderHandle, type BulkCalc } from '@/components/store/product/StorefrontVariantBuilder'
 import { getReviews, createReview, initReviewData, type Review } from '@/lib/review-store'
-import { initCatalogData, getCatalogItems, type CatalogItem } from '@/lib/catalog-store'
 
 /* ── Review Form Component ─────────────────────────────────────── */
 function ReviewForm({ productName, userName, onSubmitted }: { productName: string; userName: string; onSubmitted: () => void }) {
@@ -272,7 +271,7 @@ export default function ProductDetail({ product }: Props) {
 
   // Load approved reviews for this product
   const [reviews, setReviews] = useState<Review[]>([])
-  const [catalogInfo, setCatalogInfo] = useState<CatalogItem['productInfo'] | null>(null)
+  const catalogInfo = product.productInfo || null
   const [categoryLabel, setCategoryLabel] = useState('')
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   useEffect(() => {
@@ -283,11 +282,6 @@ export default function ProductDetail({ product }: Props) {
       (r) => r.status === 'Approved' && productName.includes(r.product.toLowerCase()),
     )
     setReviews(approved)
-    // Load product info from catalog store
-    initCatalogData()
-    const catalogItems = getCatalogItems()
-    const match = catalogItems.find(c => c.name.toLowerCase() === product.name.toLowerCase())
-    if (match?.productInfo) setCatalogInfo(match.productInfo)
     // Load category info and related products (async)
     getStoreCategories().then(cats => {
       const cat = cats.find((c) => c.id === product.category)

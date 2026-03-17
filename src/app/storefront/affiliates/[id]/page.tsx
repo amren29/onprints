@@ -156,7 +156,7 @@ export default function AffiliateDetailPage() {
 
   return (
     <MyStoreShell>
-      {updateMut.isPending && <SavingOverlay message="Saving changes..." />}
+      {updateMut.isPending && <SavingOverlay message="Saving changes…" />}
       <div className="page-header" style={{ marginBottom: 20 }}>
         <Link href="/storefront/affiliates" className="back-btn"><BackIcon /> Affiliates</Link>
         <div className="page-actions">

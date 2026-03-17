@@ -107,7 +107,7 @@ export default function CheckoutPage() {
   const addOrder = useAuthStore((s) => s.addOrder)
   const debitWallet = useAuthStore((s) => s.debitWallet)
   const globalSettings = useStoreGlobal()
-  const { basePath } = useStore()
+  const { basePath, shopId } = useStore()
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(SETTINGS_DEFAULTS)
   const [settingsLoaded, setSettingsLoaded] = useState(false)
 
@@ -386,7 +386,7 @@ export default function CheckoutPage() {
         clearAttribution()
       }
       clearCart()
-      removeCurrentSession()
+      removeCurrentSession(shopId)
       router.push(`${basePath}/order-success?id=${orderId}&email=${encodeURIComponent(contact.email)}&total=${total.toFixed(2)}&method=wallet`)
     } else if (payment === 'online') {
       // ── Billplz Checkout flow ──────────────────────────────────
@@ -462,7 +462,7 @@ export default function CheckoutPage() {
           discountUsageCount: appliedDiscount?.usageCount ?? 0,
           adminOrderId: adminOrder.id,
         }
-        sessionStorage.setItem('saasprint-pending-order', JSON.stringify(pendingOrder))
+        sessionStorage.setItem('onprints-pending-order', JSON.stringify(pendingOrder))
 
         const res = await fetch('/api/store/checkout', {
           method: 'POST',
@@ -571,7 +571,7 @@ export default function CheckoutPage() {
       }
 
       clearCart()
-      removeCurrentSession()
+      removeCurrentSession(shopId)
       router.push(`${basePath}/order-success?id=${orderId}&email=${encodeURIComponent(contact.email)}&total=${total.toFixed(2)}&method=transfer&adminId=${adminOrder.id}`)
       } catch (err) {
 

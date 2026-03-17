@@ -96,8 +96,8 @@ export function docHeader(type: string, id: string, status: string, badgeBg: str
   return `
     <div class="doc-header">
       <div>
-        <div class="company-name">SaasPrint</div>
-        <div class="company-sub">saasprint.my</div>
+        <div class="company-name">OnPrints</div>
+        <div class="company-sub">onprints.my</div>
       </div>
       <div class="doc-meta">
         <div class="doc-type">${type}</div>
@@ -112,7 +112,7 @@ export function docHeader(type: string, id: string, status: string, badgeBg: str
 
 export function docFooter(): string {
   return `<div class="doc-footer">
-    <span>SaasPrint Sdn. Bhd. · saasprint.my</span>
+    <span>OnPrints Sdn. Bhd. · onprints.my</span>
     <span>${new Date().toLocaleDateString('en-MY', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
   </div>`
 }

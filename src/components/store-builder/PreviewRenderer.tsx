@@ -411,7 +411,7 @@ export default function PreviewRenderer({
           <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#fed330' }} />
           <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#26de81' }} />
           <div style={{ flex: 1, background: '#fff', borderRadius: 4, padding: '3px 10px', marginLeft: 8, fontSize: 10.5, color: '#6b7280', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            saasprint.my/s/{slug}{urlPath}
+            onprints.my/s/{slug}{urlPath}
             {!published && view === 'home' && <span style={{ marginLeft: 6, color: '#f59e0b', fontFamily: 'Inter,sans-serif', fontWeight: 600 }}>[Draft]</span>}
           </div>
         </div>

@@ -57,7 +57,7 @@ export default function WalletPage() {
     setError('')
 
     try {
-      sessionStorage.setItem('saasprint-pending-topup', JSON.stringify({ amount: amt }))
+      sessionStorage.setItem('onprints-pending-topup', JSON.stringify({ amount: amt }))
 
       const res = await fetch('/api/store/topup', {
         method: 'POST',

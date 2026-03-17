@@ -8,7 +8,7 @@ import SavingOverlay from '@/components/SavingOverlay'
 import type { DbCustomer } from '@/lib/db/customers'
 import CustomSelect from '@/components/CustomSelect'
 import { useShop } from '@/providers/shop-provider'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const BackIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>)
 const PaperclipIcon = () => (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>)
@@ -20,6 +20,7 @@ const METHODS = ['Credit Card', 'Bank Transfer', 'Cash', 'Cheque', 'Online']
 export default function NewPaymentPage() {
   const router = useRouter()
   const { shopId } = useShop()
+  const qc = useQueryClient()
 
   const { data: customers = [] } = useQuery<DbCustomer[]>({
     queryKey: ['customers', shopId],
@@ -44,7 +45,7 @@ export default function NewPaymentPage() {
       }
       return res.json()
     },
-    onSuccess: () => router.push('/payments?created=1'),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['payments', shopId] }); router.push('/payments?created=1') },
     onError: (err: any) => {
       console.error('[createPayment]', err)
       setSaving(false)

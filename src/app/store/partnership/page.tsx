@@ -65,7 +65,7 @@ export default function PartnershipPage() {
           <AnimateIn animation="fade-up">
             <div className="inline-block bg-accent/10 text-accent text-xs font-semibold px-3 py-1 rounded-full mb-4">Agent Partnership</div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
-              Become a SaasPrint<br />reseller agent
+              Become an OnPrints<br />reseller agent
             </h1>
             <p className="text-lg text-gray-500 max-w-xl mx-auto">
               Partner with us and earn by reselling professional print products to your clients. Buy at agent prices, sell at retail, and keep the margin.

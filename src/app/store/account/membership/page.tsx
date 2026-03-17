@@ -72,7 +72,7 @@ export default function AccountMembershipPage() {
 
     try {
       // Save pending info to sessionStorage
-      sessionStorage.setItem('saasprint-pending-membership', JSON.stringify({
+      sessionStorage.setItem('onprints-pending-membership', JSON.stringify({
         tierId: flow.tierId,
         tierName: flow.tierName,
         price: flow.price,

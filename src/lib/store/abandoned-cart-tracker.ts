@@ -89,13 +89,19 @@ export function snapshotCart(
 }
 
 /** Remove the current session (called on successful checkout) */
-export function removeCurrentSession() {
+export function removeCurrentSession(shopId?: string) {
   if (typeof window === 'undefined') return
   const sessionId = sessionStorage.getItem(SESSION_KEY)
   if (!sessionId) return
   const all = loadAll().filter(c => c.sessionId !== sessionId)
   saveAll(all)
   sessionStorage.removeItem(SESSION_KEY)
+  // Also remove from Supabase if shopId available
+  if (shopId) {
+    import('@/lib/db/storefront').then(({ deleteAbandonedCartBySession }) => {
+      deleteAbandonedCartBySession(shopId, sessionId).catch(() => {})
+    }).catch(() => {})
+  }
 }
 
 /* ── Admin API ────────────────────────────────────── */

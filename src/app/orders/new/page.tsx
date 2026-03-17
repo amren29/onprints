@@ -14,7 +14,7 @@ import { getAgents } from '@/lib/db/agents'
 import { calcBasePrice, applyModifiers } from '@/lib/option-pricing'
 import { calcOrderTotals, type OrderItem } from '@/lib/order-store'
 import { useShop } from '@/providers/shop-provider'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const BackIcon    = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>)
 const PlusIcon    = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>)
@@ -141,6 +141,7 @@ function emptyConfig(item: CatalogItem, rowId: string | null = null): ConfigStat
 export default function NewOrderPage() {
   const router = useRouter()
   const { shopId } = useShop()
+  const qc = useQueryClient()
 
   const { data: dbProducts = [] } = useQuery({
     queryKey: ['products', shopId],
@@ -164,7 +165,7 @@ export default function NewOrderPage() {
 
   const createMut = useMutation({
     mutationFn: (data: Parameters<typeof dbCreateOrder>[1]) => dbCreateOrder(shopId, data),
-    onSuccess: () => router.push('/orders?created=1'),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['orders', shopId] }); router.push('/orders?created=1') },
     onError: (err: any) => {
       console.error('[createOrder]', err)
       setSaving(false)
@@ -814,15 +815,10 @@ export default function NewOrderPage() {
                     ]}
                   />
                   {config.qtyMode === 'custom' && (
-                    <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid var(--border)', borderRadius: 8, overflow: 'hidden', width: 150, background: 'var(--bg-card)', marginTop: 10 }}>
-                      <button onClick={() => setConfig(p => p ? { ...p, qty: String(Math.max(1, Number(p.qty) - 1)) } : null)}
-                        style={{ width: 38, height: 40, background: 'none', border: 'none', borderRight: '1px solid var(--border)', cursor: 'pointer', fontSize: 18, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                      <input type="number" min="1" value={config.qty}
-                        onChange={e => setConfig(p => p ? { ...p, qty: e.target.value } : null)}
-                        style={{ flex: 1, border: 'none', outline: 'none', textAlign: 'center', fontSize: 14, fontWeight: 600, background: 'transparent', color: 'var(--text-primary)', padding: '0 4px' }} />
-                      <button onClick={() => setConfig(p => p ? { ...p, qty: String(Number(p.qty) + 1) } : null)}
-                        style={{ width: 38, height: 40, background: 'none', border: 'none', borderLeft: '1px solid var(--border)', cursor: 'pointer', fontSize: 18, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
-                    </div>
+                    <input className="form-input" type="number" min="1" value={config.qty}
+                      onChange={e => setConfig(p => p ? { ...p, qty: e.target.value } : null)}
+                      placeholder="Enter quantity"
+                      style={{ width: 180, marginTop: 10, fontWeight: 600 }} />
                   )}
                 </div>
               )}

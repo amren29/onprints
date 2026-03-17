@@ -153,7 +153,12 @@ export default function NewCatalogPage() {
   }
   const [activeInfoTab, setActiveInfoTab] = useState<string>('overview')
   const [productInfo, setProductInfo] = useState<Record<string, string>>({
-    overview: '', printSpec: '', artworkGuidelines: '', processDuration: '', howToOrder: '', delivery: '',
+    overview: '',
+    printSpec: 'Min. resolution: 300 DPI\nColor mode: CMYK\nAccepted formats: PDF, AI, PSD, PNG, JPG\nFonts: Convert to outlines',
+    artworkGuidelines: 'Submit files in PDF, AI, PSD, or high-resolution JPEG/PNG\nEnsure minimum 300 DPI resolution\nInclude 3 mm bleed on all sides\nKeep content within safe area (5 mm from trim)\nUse CMYK color mode\nConvert all fonts to outlines/curves',
+    processDuration: 'Artwork Verification — 1 working day\nProduction — 5–7 working days\nQuality Check & Packing — 1 working day',
+    howToOrder: 'Configure Your Product — Select your preferred material, finishing, size, and quantity.\nUpload Your Artwork — Upload your design file or create one using Canva.\nAdd to Cart & Checkout — Review your order, fill in delivery details, and complete payment.\nWe Print & Deliver — Our team reviews your artwork, prints it, and ships it to you or prepares for self-collection.',
+    delivery: 'Self Pick-Up — Collect your order from our facility. You will be notified via SMS/email when your order is ready.\nDelivery — Peninsular Malaysia — Standard delivery within 1–3 working days after production is complete.\nEast Malaysia & International — Delivery to Sabah, Sarawak, and international destinations is available. Please contact us for a shipping quote.',
   })
 
   // Test calculator state (storefront preview)
@@ -808,7 +813,7 @@ export default function NewCatalogPage() {
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#28c840' }} />
             </div>
             <div style={{ flex: 1, background: 'var(--bg-card)', borderRadius: 6, padding: '3px 10px', fontSize: 11, color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-              saasprint.my/product/{sku?.toLowerCase() || 'new-product'}
+              onprints.my/product/{sku?.toLowerCase() || 'new-product'}
             </div>
             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Storefront Preview</span>
           </div>

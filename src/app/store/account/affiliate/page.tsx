@@ -73,7 +73,7 @@ export default function AffiliatePage() {
   if (!user) return null
 
   const code = user.affiliateCode || user.name.split(' ')[0].toUpperCase()
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://saasprint.com'
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://onprints.my'
 
   function handleCopyProduct(slug: string) {
     const link = `${baseUrl}/store/products/${slug}?ref=${code}`

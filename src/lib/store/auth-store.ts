@@ -5,7 +5,7 @@ import { User, UserRole, Address, SavedArtwork, Order, CanvaTokens, UserMembersh
 // ── Admin utility functions (standalone, directly access localStorage) ───────
 // These let admin pages read/write store user data without being logged in as that user.
 
-const AUTH_STORAGE_KEY = 'saasprint-auth-v2'
+const AUTH_STORAGE_KEY = 'onprints-auth-v2'
 
 function readAuthStore(): { state: { users: User[]; currentUser: User | null } } {
   if (typeof window === 'undefined') return { state: { users: [], currentUser: null } }
@@ -583,7 +583,7 @@ export const useAuthStore = create<AuthStore>()(
         }),
     }),
     {
-      name: 'saasprint-auth-v2',
+      name: 'onprints-auth-v2',
       onRehydrateStorage: () => (state) => {
         if (state) state.isHydrated = true
       },

@@ -155,7 +155,7 @@ function InviteModal({ onClose, onInvite }: { onClose: () => void; onInvite: (na
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <label className="form-group"><span className="form-label" style={formLabel}>Full Name *</span><input className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Ahmad Zawawi" style={{ padding: '10px 12px' }} /></label>
-          <label className="form-group"><span className="form-label" style={formLabel}>Email Address *</span><input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="user@saasprint.my" style={{ padding: '10px 12px' }} /></label>
+          <label className="form-group"><span className="form-label" style={formLabel}>Email Address *</span><input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="user@onprints.my" style={{ padding: '10px 12px' }} /></label>
           {err && <div style={{ fontSize: 12, color: 'var(--negative)' }}>{err}</div>}
           <label className="form-group">
             <span className="form-label" style={formLabel}>Role</span>
@@ -1039,7 +1039,7 @@ function BillingSection({ onSave, shopId }: { onSave: (msg: string) => void; sho
                 <tr><td colSpan={6}><div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', fontSize: 13 }}>No invoices yet.</div></td></tr>
               )}
               {invoices.map(inv => {
-                const description = inv.lines?.data?.[0]?.description || 'SaasPrint Subscription'
+                const description = inv.lines?.data?.[0]?.description || 'OnPrints Subscription'
                 const isPaid = inv.status === 'paid'
                 const date = inv.created ? new Date(inv.created * 1000).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
                 const handleDownload = () => {

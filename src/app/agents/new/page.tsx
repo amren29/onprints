@@ -8,6 +8,7 @@ import SavingOverlay from '@/components/SavingOverlay'
 import { createAgent, type DbAgent } from '@/lib/db/agents'
 import { useShop } from '@/providers/shop-provider'
 import CustomSelect from '@/components/CustomSelect'
+import { useQueryClient } from '@tanstack/react-query'
 
 const BackIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>)
 
@@ -16,6 +17,7 @@ const STATUSES: DbAgent['status'][] = ['Active', 'Suspended', 'Inactive']
 export default function NewAgentPage() {
   const router = useRouter()
   const { shopId } = useShop()
+  const qc = useQueryClient()
   const [saving, setSaving] = useState(false)
   const [tried, setTried] = useState(false)
 
@@ -40,6 +42,7 @@ export default function NewAgentPage() {
         start_date: startDate || new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' }),
         notes,
       })
+      qc.invalidateQueries({ queryKey: ['agents', shopId] })
       router.push('/agents?created=1')
     } catch { setSaving(false) }
   }
@@ -61,7 +64,7 @@ export default function NewAgentPage() {
           <div className="card" style={{ padding: 20 }}>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, color: 'var(--text-primary)' }}>Personal Info</div>
             <div className="form-group"><label className="form-label">Full Name *</label><input className={`form-input${tried && !fullName.trim() ? ' error' : ''}`} value={fullName} onChange={e => setName(e.target.value)} placeholder="Full name" /></div>
-            <div className="form-group"><label className="form-label">Email</label><input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="agent@saasprint.io" /></div>
+            <div className="form-group"><label className="form-label">Email</label><input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="agent@onprints.my" /></div>
             <div className="form-group"><label className="form-label">Phone</label><input className="form-input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+60 12-345 6789" /></div>
             <div className="form-group"><label className="form-label">Region</label><input className="form-input" value={region} onChange={e => setRegion(e.target.value)} placeholder="e.g. KL Central" /></div>
             <div className="form-group"><label className="form-label">Start Date</label><input className="form-input" value={startDate} onChange={e => setStartDate(e.target.value)} placeholder="e.g. Mar 1, 2026" /></div>

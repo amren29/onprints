@@ -70,7 +70,7 @@ export const useMembershipStore = create<MembershipStore>()(
         set((state) => ({ tiers: state.tiers.filter((t) => t.id !== id) })),
     }),
     {
-      name: 'saasprint-membership-tiers-v2',
+      name: 'onprints-membership-tiers-v2',
       onRehydrateStorage: () => (state) => {
         if (state) state.isHydrated = true
       },

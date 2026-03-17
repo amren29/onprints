@@ -211,7 +211,7 @@ export default function RegisterPage() {
                 <rect x="14" y="14" width="7" height="7" rx="1.5" fill="white" opacity="0.4"/>
               </svg>
             </div>
-            <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.3px' }}>SaasPrint</span>
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.3px' }}>OnPrints</span>
           </div>
 
           {/* Heading */}
@@ -455,7 +455,7 @@ export default function RegisterPage() {
         fontSize: 12, color: '#94a3b8',
         pointerEvents: 'none',
       }}>
-        <span>Copyright © 2026 SaasPrint Inc.</span>
+        <span>Copyright © 2026 OnPrints</span>
         <span style={{ pointerEvents: 'all' }}>
           <Link href="/privacy" style={{ color: '#94a3b8', textDecoration: 'none' }}>Privacy Policy</Link>
         </span>

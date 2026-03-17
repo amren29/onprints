@@ -8,6 +8,7 @@ import SavingOverlay from '@/components/SavingOverlay'
 import { createCustomer, type DbCustomer } from '@/lib/db/customers'
 import { useShop } from '@/providers/shop-provider'
 import CustomSelect from '@/components/CustomSelect'
+import { useQueryClient } from '@tanstack/react-query'
 
 const BackIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>)
 
@@ -18,6 +19,7 @@ const PAYMENT_TERMS = ['', 'COD', 'Net 7', 'Net 14', 'Net 30', 'Net 60']
 export default function NewCustomerPage() {
   const router = useRouter()
   const { shopId } = useShop()
+  const qc = useQueryClient()
   const [saving, setSaving] = useState(false)
   const [tried, setTried] = useState(false)
 
@@ -54,6 +56,7 @@ export default function NewCustomerPage() {
         credit_limit: creditLimit,
         notes,
       })
+      qc.invalidateQueries({ queryKey: ['customers', shopId] })
       router.push('/customers?created=1')
     } catch (err) {
       console.error('Failed to create customer:', err)

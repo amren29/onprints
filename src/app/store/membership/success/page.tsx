@@ -56,7 +56,7 @@ function MembershipSuccessContent() {
         handled = true
 
         // Recover pending membership info
-        const pendingRaw = sessionStorage.getItem('saasprint-pending-membership')
+        const pendingRaw = sessionStorage.getItem('onprints-pending-membership')
         let tierId = data.tierId
         let tName = data.tierName
         let discountRate = 0
@@ -115,7 +115,7 @@ function MembershipSuccessContent() {
           })
         }
 
-        sessionStorage.removeItem('saasprint-pending-membership')
+        sessionStorage.removeItem('onprints-pending-membership')
         setTierName(tName)
         setVerified(true)
         setVerifying(false)

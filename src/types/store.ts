@@ -76,6 +76,14 @@ export interface Product {
   /** Sqft pricing config for custom sizes */
   sqftPricing?: { pricePerSqft: number; minCharge?: number }
   processDuration?: string
+  productInfo?: {
+    overview?: string
+    printSpec?: string
+    artworkGuidelines?: string
+    processDuration?: string
+    howToOrder?: string
+    delivery?: string
+  }
   bulkVariant?: boolean
   bulkVolumeTiers?: { qty: number; unitPrice: number }[]
   bulkOptionGroups?: {
@@ -141,7 +149,7 @@ export interface CanvaExportJob {
 
 export type UserRole = 'customer' | 'agent'
 
-// Aligned with admin panel (frontend-saasprint)
+// Aligned with admin panel (frontend-onprints)
 export type OrderStatus = 'Pending' | 'Confirmed' | 'Cancelled'
 export type ProductionStatus = 'Queued' | 'In Progress' | 'Quality Check' | 'Completed' | 'Shipped' | 'Delivered' | '—'
 export type OrderSource = 'manual' | 'online-store'

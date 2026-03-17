@@ -105,7 +105,7 @@ export default function CanvaDesignPicker({
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          title: `${productName} - SaasPrint`,
+          title: `${productName} - OnPrints`,
           widthMm: trimWidthMm,
           heightMm: trimHeightMm,
           bleedMm,

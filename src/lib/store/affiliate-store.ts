@@ -52,7 +52,7 @@ export const useAffiliateStore = create<AffiliateStore>()(
       clearAttribution: () => set({ attribution: null }),
     }),
     {
-      name: 'saasprint-affiliate-v2',
+      name: 'onprints-affiliate-v2',
       onRehydrateStorage: () => (state) => {
         if (state) state.isHydrated = true
       },

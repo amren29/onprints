@@ -92,7 +92,7 @@ export default function StorePreviewPage() {
               height: '100%',
               border: 'none',
             }}
-            title="SaasPrint Store"
+            title="OnPrints Store"
           />
         </div>
       </div>

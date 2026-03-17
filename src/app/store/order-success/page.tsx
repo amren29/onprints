@@ -47,7 +47,7 @@ export default function OrderSuccessPage() {
 }
 
 function OrderSuccessContent() {
-  const { basePath } = useStore()
+  const { basePath, shopId } = useStore()
   const params = useSearchParams()
   const billplzId = params.get('billplz_id')
   const isTransfer = params.get('method') === 'transfer'
@@ -112,7 +112,7 @@ function OrderSuccessContent() {
         const email = data.contact?.email || 'your email'
 
         // Recover pending order from sessionStorage
-        const pendingRaw = sessionStorage.getItem('saasprint-pending-order')
+        const pendingRaw = sessionStorage.getItem('onprints-pending-order')
         if (pendingRaw) {
           try {
             const pending = JSON.parse(pendingRaw)
@@ -194,8 +194,8 @@ function OrderSuccessContent() {
 
         // Clear cart and pending order
         clearCart()
-        removeCurrentSession()
-        sessionStorage.removeItem('saasprint-pending-order')
+        removeCurrentSession(shopId)
+        sessionStorage.removeItem('onprints-pending-order')
 
         setOrderData({
           orderId,

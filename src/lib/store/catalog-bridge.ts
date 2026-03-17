@@ -163,6 +163,14 @@ export function dbProductToProduct(item: DbProduct, categoryName: string): Produ
     },
     isActive: item.status === 'Active' && item.visibility === 'published',
     processDuration: (item.product_info as any)?.processDuration || undefined,
+    productInfo: item.product_info ? {
+      overview: (item.product_info as any).overview || undefined,
+      printSpec: (item.product_info as any).printSpec || undefined,
+      artworkGuidelines: (item.product_info as any).artworkGuidelines || undefined,
+      processDuration: (item.product_info as any).processDuration || undefined,
+      howToOrder: (item.product_info as any).howToOrder || undefined,
+      delivery: (item.product_info as any).delivery || undefined,
+    } : undefined,
     sizeMode: sizeMode !== 'fixed' ? sizeMode : undefined,
     sqftPricing: (item.sizes as any)?.sqft ? { pricePerSqft: (item.sizes as any).sqft.pricePerSqft, minCharge: (item.sizes as any).sqft.minCharge } : undefined,
     ...(item.bulk_variant && optionGroups.length ? {

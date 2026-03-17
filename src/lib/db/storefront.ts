@@ -59,23 +59,44 @@ export async function upsertAbandonedCart(shopId: string, input: {
   item_count?: number
 }) {
   const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('abandoned_carts')
-    .upsert({
-      shop_id: shopId,
-      session_id: input.session_id,
-      customer_name: input.customer_name ?? '',
-      customer_email: input.customer_email ?? '',
-      is_guest: input.is_guest ?? true,
-      items: input.items,
-      total_value: input.total_value ?? 0,
-      item_count: input.item_count ?? 0,
-    }, { onConflict: 'id' })
-    .select()
-    .single()
 
-  if (error) throw new Error(error.message)
-  return data as DbAbandonedCart
+  // Check if a row already exists for this session
+  const { data: existing } = await supabase
+    .from('abandoned_carts')
+    .select('id')
+    .eq('shop_id', shopId)
+    .eq('session_id', input.session_id)
+    .maybeSingle()
+
+  const payload = {
+    shop_id: shopId,
+    session_id: input.session_id,
+    customer_name: input.customer_name ?? '',
+    customer_email: input.customer_email ?? '',
+    is_guest: input.is_guest ?? true,
+    items: input.items,
+    total_value: input.total_value ?? 0,
+    item_count: input.item_count ?? 0,
+  }
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('abandoned_carts')
+      .update(payload)
+      .eq('id', existing.id)
+      .select()
+      .single()
+    if (error) throw new Error(error.message)
+    return data as DbAbandonedCart
+  } else {
+    const { data, error } = await supabase
+      .from('abandoned_carts')
+      .insert(payload)
+      .select()
+      .single()
+    if (error) throw new Error(error.message)
+    return data as DbAbandonedCart
+  }
 }
 
 export async function deleteAbandonedCart(shopId: string, id: string) {

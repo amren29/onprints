@@ -6,7 +6,7 @@ const PLAN_FEES: Record<string, number> = {
   pro: 20,
 }
 
-const SAASPRINT_BILLPLZ_EMAIL = process.env.SAASPRINT_BILLPLZ_EMAIL || 'platform@saasprint.com'
+const ONPRINTS_BILLPLZ_EMAIL = process.env.ONPRINTS_BILLPLZ_EMAIL || 'platform@onprints.my'
 
 export async function POST(req: NextRequest) {
   try {
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
           const collection = await createCollection(
             `${shop.bank_account_name || shopId} - ${plan}`,
             {
-              email: SAASPRINT_BILLPLZ_EMAIL,
+              email: ONPRINTS_BILLPLZ_EMAIL,
               fixed_cut: newFixedCut,
               variable_cut: 0,
               split_header: true,

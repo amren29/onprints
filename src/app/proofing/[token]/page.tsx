@@ -415,9 +415,9 @@ export default function ProofingPage() {
         {/* ── Header ── */}
         <div style={S.header}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={S.brandIcon}>SP</div>
+            <div style={S.brandIcon}>OP</div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>SaasPrint</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>OnPrints</div>
               <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Digital Proof Review</div>
             </div>
           </div>
@@ -1032,7 +1032,7 @@ export default function ProofingPage() {
             <span>This is a secure proof review link</span>
           </div>
           <div style={{ fontSize: 11, color: 'var(--border-strong)', marginTop: 4 }}>
-            Powered by SaasPrint
+            Powered by OnPrints
           </div>
         </div>
       </div>

@@ -63,7 +63,7 @@ function WalletSuccessContent() {
           status: 'completed',
         })
 
-        sessionStorage.removeItem('saasprint-pending-topup')
+        sessionStorage.removeItem('onprints-pending-topup')
         setCreditedAmount(amt)
         setVerified(true)
         setVerifying(false)

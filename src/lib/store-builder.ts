@@ -151,7 +151,7 @@ export const SECTION_REGISTRY: Record<SectionType, SectionDef> = {
       title: 'What Our Clients Say',
       items: [
         { name: 'Ahmad Razak', text: 'Excellent quality business cards. Fast delivery and great communication throughout. Highly recommended!', company: 'Razak Corp \u2605\u2605\u2605\u2605\u2605' },
-        { name: 'Sarah Lim', text: "We've been using SaasPrint for all our marketing materials. Consistently impressive quality and on-time delivery.", company: 'Bright Studios \u2605\u2605\u2605\u2605\u2605' },
+        { name: 'Sarah Lim', text: "We've been using OnPrints for all our marketing materials. Consistently impressive quality and on-time delivery.", company: 'Bright Studios \u2605\u2605\u2605\u2605\u2605' },
         { name: 'Priya Nair', text: 'The banner quality exceeded our expectations. Great value for money and super fast turnaround.', company: 'EventPro MY \u2605\u2605\u2605\u2605\u2605' },
         { name: 'Lee Wei Ming', text: 'Best sticker printing in KL! The die-cut quality is amazing. Already placing our next order.', company: 'FreshMart \u2605\u2605\u2605\u2605\u2605' },
       ],
@@ -249,7 +249,7 @@ export const SECTION_REGISTRY: Record<SectionType, SectionDef> = {
       badge: 'Our Story',
       title: 'From a small shop to Malaysia\'s trusted print partner',
       paragraphs: [
-        'SaasPrint started as a small print shop in the heart of Kuala Lumpur. We saw how painful the traditional printing process was \u2014 endless back-and-forth emails, unclear pricing, and artwork issues discovered only after printing.',
+        'OnPrints started as a small print shop in the heart of Kuala Lumpur. We saw how painful the traditional printing process was \u2014 endless back-and-forth emails, unclear pricing, and artwork issues discovered only after printing.',
         'So we built something better: an online platform where you can configure your product, see instant pricing, proof your artwork in real-time, and track your order from start to finish. Today, we serve hundreds of businesses across Malaysia.',
       ],
       timeline: [
@@ -274,7 +274,7 @@ export const SECTION_REGISTRY: Record<SectionType, SectionDef> = {
         { label: 'Mon\u2013Fri', time: '9:00 AM \u2013 6:00 PM' },
         { label: 'Saturday', time: '9:00 AM \u2013 1:00 PM' },
       ],
-      email: 'hello@saasprint.com',
+      email: 'hello@onprints.com',
       mapPlaceholder: 'Kuala Lumpur, Malaysia',
     },
   },
@@ -374,7 +374,7 @@ export const DEFAULT_PAGE_SECTIONS: Record<StorePageId, () => PageSection[]> = {
     sec('newsletter', 'default'),
   ],
   about: () => [
-    sec('hero', 'gradient', { badge: 'About SaasPrint', headline: 'Professional printing,\nmade simple.', subtitle: 'We are a Kuala Lumpur-based printing company on a mission to make high-quality print accessible, affordable, and hassle-free for everyone.', ctaPrimary: '', ctaSecondary: '' }),
+    sec('hero', 'gradient', { badge: 'About OnPrints', headline: 'Professional printing,\nmade simple.', subtitle: 'We are a Kuala Lumpur-based printing company on a mission to make high-quality print accessible, affordable, and hassle-free for everyone.', ctaPrimary: '', ctaSecondary: '' }),
     sec('stats', 'inline', { items: [{ value: '10K+', label: 'Orders Completed' }, { value: '500+', label: 'Business Clients' }, { value: '14', label: 'Product Categories' }, { value: '4.8', label: 'Customer Rating' }] }),
     sec('story-timeline', 'default'),
     sec('features', '4-col', {
@@ -447,7 +447,7 @@ export const DEFAULT_PAGE_SECTIONS: Record<StorePageId, () => PageSection[]> = {
       ],
     }),
     sec('features', '4-col', {
-      title: 'Member Benefits', subtitle: 'Enjoy exclusive perks and savings as a SaasPrint member.',
+      title: 'Member Benefits', subtitle: 'Enjoy exclusive perks and savings as a OnPrints member.',
       items: [
         { icon: '\uD83D\uDCB0', title: 'Cheaper Rates', desc: 'Save up to 15% on every order with our tiered discount system.' },
         { icon: '\uD83D\uDCB3', title: 'Quick & Easy Payment', desc: 'Use your member credit balance for faster checkout on all orders.' },
@@ -457,7 +457,7 @@ export const DEFAULT_PAGE_SECTIONS: Record<StorePageId, () => PageSection[]> = {
     }),
     sec('text-block', 'narrow', {
       heading: 'Terms & Conditions',
-      body: '1. Open to Malaysian citizens (18+) with valid identification and foreign nationals with a valid Malaysian address.\n2. Membership is a yearly subscription. Your discount is activated immediately upon payment.\n3. All membership tiers are valid for 12 months from the date of subscription.\n4. Discounts are applied automatically to all orders during your active membership period.\n5. Membership fees are non-refundable once activated.\n6. You may upgrade to a higher tier at any time by paying the price difference.\n7. SaasPrint reserves the right to modify membership terms with 30 days prior notice.',
+      body: '1. Open to Malaysian citizens (18+) with valid identification and foreign nationals with a valid Malaysian address.\n2. Membership is a yearly subscription. Your discount is activated immediately upon payment.\n3. All membership tiers are valid for 12 months from the date of subscription.\n4. Discounts are applied automatically to all orders during your active membership period.\n5. Membership fees are non-refundable once activated.\n6. You may upgrade to a higher tier at any time by paying the price difference.\n7. OnPrints reserves the right to modify membership terms with 30 days prior notice.',
       alignment: 'center',
     }),
     sec('cta', 'centered', { headline: 'Ready to start saving?', subtitle: 'Choose a plan and subscribe to get started. Your discount activates immediately.', buttonText: 'Subscribe Now', bgStyle: 'light', buttonAction: '/store/account/membership', ctaSecondary: 'Contact Us', ctaSecondaryAction: '/store/contact' }),
@@ -473,17 +473,17 @@ export const DEFAULT_PAGE_SECTIONS: Record<StorePageId, () => PageSection[]> = {
 
 // ── Default global settings ──────────────────────────
 export const DEFAULT_GLOBAL: GlobalSettings = {
-  shopName: 'SaasPrint',
-  slug: 'saasprint',
+  shopName: 'OnPrints',
+  slug: 'onprints',
   tagline: 'Your trusted print partner in Malaysia',
   accentColor: '#006AFF',
   showPrices: true,
-  contactEmail: 'hello@saasprint.com',
+  contactEmail: 'hello@onprints.com',
   contactPhone: '+60 3-7865 4400',
   contactWhatsapp: '+60 12-388 4411',
   contactAddress: 'Kuala Lumpur, Malaysia',
   showWhatsapp: true,
-  metaTitle: 'SaasPrint \u2014 Professional Print Services Malaysia',
+  metaTitle: 'OnPrints \u2014 Professional Print Services Malaysia',
   metaDesc: 'Fast, quality printing for business cards, flyers, banners, apparel and more. Get an instant quote today.',
   keywords: 'print shop malaysia, business cards, flyers, banners, t-shirt printing',
   published: true,

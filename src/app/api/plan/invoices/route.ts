@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
             created: Math.floor(new Date('2026-03-10T08:00:00Z').getTime() / 1000),
             hosted_invoice_url: '#',
             invoice_pdf: '#',
-            lines: { data: [{ description: 'SaasPrint Growth Plan — Monthly subscription' }] },
+            lines: { data: [{ description: 'OnPrints Growth Plan — Monthly subscription' }] },
           },
           {
             id: 'in_mock002',
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
             created: Math.floor(new Date('2026-02-10T08:00:00Z').getTime() / 1000),
             hosted_invoice_url: '#',
             invoice_pdf: '#',
-            lines: { data: [{ description: 'SaasPrint Growth Plan — Monthly subscription' }] },
+            lines: { data: [{ description: 'OnPrints Growth Plan — Monthly subscription' }] },
           },
           {
             id: 'in_mock003',
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
             created: Math.floor(new Date('2026-01-10T08:00:00Z').getTime() / 1000),
             hosted_invoice_url: '#',
             invoice_pdf: '#',
-            lines: { data: [{ description: 'SaasPrint Starter Plan — Monthly subscription' }] },
+            lines: { data: [{ description: 'OnPrints Starter Plan — Monthly subscription' }] },
           },
         ],
       })

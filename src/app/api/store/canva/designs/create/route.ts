@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const totalHMm = heightMm + bleedMm * 2
 
     const data = await createDesign(accessToken, {
-      title: title || 'SaasPrint Design',
+      title: title || 'OnPrints Design',
       widthPx: mmToPx(totalWMm),
       heightPx: mmToPx(totalHMm),
       correlationState: slug,

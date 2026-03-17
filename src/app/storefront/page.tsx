@@ -87,7 +87,7 @@ export default function MyStoreDashboard() {
   const totalOnlineRevenue = onlineOrders.filter(o => o.status !== 'Cancelled').reduce((s, o) => s + (o.grand_total ?? 0), 0)
   const pendingOnline = onlineOrders.filter(o => o.status === 'Pending').length
   const confirmedOnline = onlineOrders.filter(o => o.status === 'Confirmed').length
-  const storefrontUrl = `saasprint.my/s/${globalSettings.slug}`
+  const storefrontUrl = `onprints.my/s/${globalSettings.slug}`
 
   // Published + Active products count (replaces localStorage enabledMap)
   const enabledCount = allProducts.filter(p => p.visibility === 'published' && p.status === 'Active').length

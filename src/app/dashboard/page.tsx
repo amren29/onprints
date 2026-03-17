@@ -233,7 +233,7 @@ function WelcomeBanner({ storeName, onDismiss, completed }: { storeName: string;
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
           <div>
             <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: '#fff' }}>
-              Welcome to {storeName || 'SaasPrint'}!
+              Welcome to {storeName || 'OnPrints'}!
             </h2>
             <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
               Complete these steps to get the most out of your workspace.

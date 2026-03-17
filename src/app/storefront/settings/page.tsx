@@ -138,15 +138,15 @@ export default function StoreSettingsPage() {
   const [toastVisible, setToastVisible] = useState(false)
   const [hydrated, setHydrated] = useState(false)
 
-  const { data: settingsRow } = useQuery({
+  const { data: settingsRow, isFetched } = useQuery({
     queryKey: ['store-settings', shopId],
     queryFn: () => getStoreSettings(shopId),
     enabled: !!shopId,
   })
 
-  // Hydrate from DB
-  if (settingsRow && !hydrated) {
-    setS(settingsRow.config as Record<string, unknown>)
+  // Hydrate from DB (or init empty for new shops with no settings row)
+  if (!hydrated && isFetched) {
+    setS(settingsRow?.config as Record<string, unknown> ?? {})
     setHydrated(true)
   }
 
