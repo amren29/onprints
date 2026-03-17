@@ -437,14 +437,16 @@ function AccountSection({ onSave }: { onSave: (msg: string) => void }) {
   const router = useRouter()
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setName(data.user.user_metadata?.name || '')
-        setEmail(data.user.email || '')
-        setPhone(data.user.user_metadata?.phone || '')
-      }
-    })
+    try {
+      const supabase = createClient()
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) {
+          setName(data.user.user_metadata?.name || '')
+          setEmail(data.user.email || '')
+          setPhone(data.user.user_metadata?.phone || '')
+        }
+      }).catch(() => {})
+    } catch { /* env vars not ready */ }
   }, [])
 
   const handleSaveAccount = async () => {

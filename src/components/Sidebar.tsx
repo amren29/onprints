@@ -195,13 +195,15 @@ export default function Sidebar() {
   const userMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUserName(data.user.user_metadata?.name || '')
-        setUserEmail(data.user.email || '')
-      }
-    })
+    try {
+      const supabase = createClient()
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) {
+          setUserName(data.user.user_metadata?.name || '')
+          setUserEmail(data.user.email || '')
+        }
+      }).catch(() => {})
+    } catch { /* env vars not ready */ }
   }, [])
 
   useEffect(() => {

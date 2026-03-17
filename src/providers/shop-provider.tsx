@@ -40,7 +40,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    async function init() {
+    async function init(retries = 3) {
       try {
         const result = await getUserShop()
         if (result) {
@@ -59,6 +59,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         console.log('[ShopProvider] No shop found, creating...')
         const created = await createShop({ name: 'My Print Shop' })
         if (created.error) {
+          // Auth session may not be ready yet after registration — retry
+          if (created.error === 'Not authenticated' && retries > 0) {
+            console.log(`[ShopProvider] Auth not ready, retrying in 1s... (${retries} left)`)
+            await new Promise(r => setTimeout(r, 1000))
+            return init(retries - 1)
+          }
           console.error('[ShopProvider] Failed to create shop:', created.error)
           setState((s) => ({ ...s, isLoading: false, error: `Shop creation failed: ${created.error}` }))
           return
