@@ -112,7 +112,11 @@ function computePrice(cfg: ConfigState): PriceResult {
   } else {
     const qty = parseFloat(cfg.qty) || 0
     const sizeRow = sizes?.fixed.find((s: any) => s.label === cfg.size)
-    br = calcBasePrice('volume', qty, { volumeTiers: sizeRow?.volumeTiers ?? [] })
+    const vt = (sizeRow?.volumeTiers ?? []).map((t: any) => ({
+      minQty: parseInt(t.minQty) || 0,
+      unitPrice: parseFloat(t.unitPrice) || 0,
+    })).filter((t: any) => t.minQty > 0 && t.unitPrice > 0)
+    br = calcBasePrice('volume', qty, { volumeTiers: vt })
   }
 
   if (!br.ok) return { ok: false, error: br.error }
@@ -885,7 +889,7 @@ export default function NewOrderPage() {
 
               {/* Confirm */}
               <button className="btn-primary" onClick={confirmConfig} disabled={!cfgPrice?.ok}
-                style={{ justifyContent: 'center', opacity: cfgPrice?.ok ? 1 : 0.4 }}>
+                style={{ justifyContent: 'center', opacity: cfgPrice?.ok ? 1 : 0.35, pointerEvents: cfgPrice?.ok ? 'auto' : 'none' }}>
                 {config.rowId ? 'Update Item' : 'Add to Order'}
               </button>
             </div>
