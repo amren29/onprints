@@ -113,6 +113,7 @@ function computePrice(cfg: ConfigState): PriceResult {
     const qty = parseFloat(cfg.qty) || 0
     if (qty <= 0) return { ok: false, error: 'Enter a quantity.' }
     const sizeRow = sizes?.fixed.find((s: any) => s.label === cfg.size)
+    console.log('[computePrice] sizeRow:', JSON.stringify(sizeRow), 'sizes:', JSON.stringify(sizes))
     const vt = (sizeRow?.volumeTiers ?? []).map((t: any) => ({
       minQty: parseInt(t.minQty) || 0,
       unitPrice: parseFloat(t.unitPrice) || 0,
