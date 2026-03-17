@@ -160,7 +160,7 @@ function computePrice(cfg: ConfigState): PriceResult {
 }
 
 function emptyConfig(item: CatalogItem, rowId: string | null = null): ConfigState {
-  return { rowId, item, size: '', qty: '100', qtyMode: 'preset', sel: {}, testW: '', testH: '', sizeUnit: 'ft' }
+  return { rowId, item, size: '', qty: '', qtyMode: 'preset', sel: {}, testW: '', testH: '', sizeUnit: 'ft' }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -796,7 +796,7 @@ export default function NewOrderPage() {
                   {(config.item.sizes.mode === 'fixed' || config.item.sizes.mode === 'both') && (
                     <CustomSelect
                       value={config.size}
-                      onChange={v => setConfig(p => p ? { ...p, size: v, qty: '100', qtyMode: 'preset' } : null)}
+                      onChange={v => setConfig(p => p ? { ...p, size: v, qty: '', qtyMode: 'preset' } : null)}
                       options={[
                         { value: '', label: '— Select size —' },
                         ...config.item.sizes.fixed.filter((s: any) => s.label).map((s: any) => ({
@@ -834,10 +834,17 @@ export default function NewOrderPage() {
                       else setConfig(p => p ? { ...p, qtyMode: 'preset', qty: v } : null)
                     }}
                     options={[
-                      ...((cfgSizeRow?.volumeTiers?.length ? cfgSizeRow.volumeTiers : (config.item.pricing as any)?.volumeTiers) ?? []).filter((t: any) => t.minQty).map((t: any) => ({
-                        value: String(t.minQty),
-                        label: String(t.minQty),
-                      })),
+                      ...(() => {
+                        // 1. Try customQtyOptions on the size row (explicit qty choices)
+                        const cqo = cfgSizeRow?.customQtyOptions as number[] | undefined
+                        if (cqo?.length) return cqo.map((q: number) => ({ value: String(q), label: String(q) }))
+                        // 2. Try volume tiers (size-level → product-level)
+                        const rawVt = cfgSizeRow?.volumeTiers?.length ? cfgSizeRow.volumeTiers
+                          : (config.item.pricing as any)?.volumeTiers
+                        const vt = (rawVt ?? []).filter((t: any) => t.minQty && t.unitPrice)
+                        if (vt.length) return vt.map((t: any) => ({ value: String(t.minQty), label: String(t.minQty) }))
+                        return []
+                      })(),
                       { value: 'custom', label: 'Custom Qty' },
                     ]}
                   />
@@ -883,8 +890,8 @@ export default function NewOrderPage() {
                 </div>
               )}
 
-              {/* Price display */}
-              {cfgPrice && (
+              {/* Price display — hide until qty is chosen */}
+              {cfgPrice && (config.qty || isCustomMode) && (
                 cfgPrice.ok ? (
                   <div style={{ background: 'var(--bg)', borderRadius: 10, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
