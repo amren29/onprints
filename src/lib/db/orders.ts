@@ -87,45 +87,53 @@ export async function createOrder(shopId: string, input: {
 }) {
   const supabase = await createClient()
 
-  const { data: seqData, error: seqErr } = await supabase
+  let seqData: string
+  const { data: seqResult, error: seqErr } = await supabase
     .rpc('next_seq', { p_shop_id: shopId, p_prefix: 'ORD', p_pad: 4 })
 
-  if (seqErr) throw new Error(seqErr.message)
+  if (seqErr) {
+    // Fallback: generate a timestamp-based seq_id if RPC fails (e.g. RLS issue)
+    seqData = `ORD-${Date.now().toString(36).toUpperCase()}`
+  } else {
+    seqData = seqResult
+  }
+
+  const row = {
+    shop_id: shopId,
+    seq_id: seqData,
+    customer_id: input.customer_id ?? null,
+    customer_name: input.customer_name ?? '',
+    agent_name: input.agent_name ?? '',
+    source: input.source ?? 'manual',
+    status: input.status ?? 'Pending',
+    production: input.production ?? '—',
+    due_date: input.due_date ?? '',
+    delivery_method: input.delivery_method ?? 'Self-Pickup',
+    delivery_address: input.delivery_address ?? '',
+    notes: input.notes ?? '',
+    currency: input.currency ?? 'MYR',
+    items: input.items ?? [],
+    payments: input.payments ?? [],
+    timeline: input.timeline ?? [],
+    original_files: input.original_files ?? [],
+    discount: input.discount ?? 0,
+    discount_type: input.discount_type ?? 'rm',
+    sst_enabled: input.sst_enabled ?? false,
+    sst_rate: input.sst_rate ?? 0,
+    sst_amount: input.sst_amount ?? 0,
+    rounding: input.rounding ?? 0,
+    shipping_cost: input.shipping_cost ?? 0,
+    subtotal: input.subtotal ?? 0,
+    grand_total: input.grand_total ?? 0,
+  }
 
   const { data, error } = await supabase
     .from('orders')
-    .insert({
-      shop_id: shopId,
-      seq_id: seqData,
-      customer_id: input.customer_id ?? null,
-      customer_name: input.customer_name ?? '',
-      agent_name: input.agent_name ?? '',
-      source: input.source ?? 'manual',
-      status: input.status ?? 'Pending',
-      production: input.production ?? '—',
-      due_date: input.due_date ?? '',
-      delivery_method: input.delivery_method ?? 'Self-Pickup',
-      delivery_address: input.delivery_address ?? '',
-      notes: input.notes ?? '',
-      currency: input.currency ?? 'MYR',
-      items: input.items ?? [],
-      payments: input.payments ?? [],
-      timeline: input.timeline ?? [],
-      original_files: input.original_files ?? [],
-      discount: input.discount ?? 0,
-      discount_type: input.discount_type ?? 'rm',
-      sst_enabled: input.sst_enabled ?? false,
-      sst_rate: input.sst_rate ?? 0,
-      sst_amount: input.sst_amount ?? 0,
-      rounding: input.rounding ?? 0,
-      shipping_cost: input.shipping_cost ?? 0,
-      subtotal: input.subtotal ?? 0,
-      grand_total: input.grand_total ?? 0,
-    })
+    .insert(row)
     .select()
     .single()
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error('Insert error: ' + error.message)
   return data as DbOrder
 }
 
