@@ -136,6 +136,75 @@ export async function createBoard(shopId: string, input: {
   return data as DbBoard
 }
 
+/** Auto-seed the mandatory Printing Production board (BRD-1) with 11 locked columns */
+export async function seedPrintingProductionBoard(shopId: string) {
+  const supabase = await createClient()
+
+  // Check if a production board already exists
+  const { data: existing } = await supabase
+    .from('boards')
+    .select('id')
+    .eq('shop_id', shopId)
+    .eq('type', 'production')
+    .limit(1)
+
+  if (existing && existing.length > 0) return existing[0]
+
+  // Create the board
+  let seqId = 'BRD-1'
+  try {
+    const { data: seqData } = await supabase
+      .rpc('next_seq', { p_shop_id: shopId, p_prefix: 'BRD', p_pad: 1 })
+    if (seqData) seqId = seqData
+  } catch { /* use default */ }
+
+  const { data: board, error } = await supabase
+    .from('boards')
+    .insert({
+      shop_id: shopId,
+      seq_id: seqId,
+      team_space_id: 'ts-default',
+      type: 'production',
+      name: 'Printing Production',
+      is_renameable: false,
+      is_system: true,
+    })
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+
+  // Seed the 11 locked columns
+  const columns = [
+    { name: 'New Order',       system_key: 'new_order',             tone: 'neutral',  position: 0 },
+    { name: 'Artwork Check',   system_key: 'artwork_check',         tone: 'info',     position: 1 },
+    { name: 'Pre-Press',       system_key: 'pre_press',             tone: 'info',     position: 2 },
+    { name: 'Plate Making',    system_key: 'plate_making',          tone: 'info',     position: 3 },
+    { name: 'Printing',        system_key: 'printing_production',   tone: 'warning',  position: 4 },
+    { name: 'Cutting',         system_key: 'cutting',               tone: 'warning',  position: 5 },
+    { name: 'Finishing',       system_key: 'finishing',             tone: 'warning',  position: 6 },
+    { name: 'Quality Check',   system_key: 'qa',                    tone: 'warning',  position: 7 },
+    { name: 'Packing',         system_key: 'packing',               tone: 'success',  position: 8 },
+    { name: 'Ready',           system_key: 'ready',                 tone: 'success',  position: 9 },
+    { name: 'Collected / Completed', system_key: 'collected_completed', tone: 'success', position: 10 },
+  ]
+
+  await supabase.from('board_columns').insert(
+    columns.map(c => ({
+      shop_id: shopId,
+      board_id: board.id,
+      name: c.name,
+      position: c.position,
+      is_locked: true,
+      system_key: c.system_key,
+      tone: c.tone,
+      visible_to_roles: [],
+    }))
+  )
+
+  return board as DbBoard
+}
+
 export async function renameBoard(shopId: string, id: string, name: string) {
   const supabase = await createClient()
   const { data, error } = await supabase

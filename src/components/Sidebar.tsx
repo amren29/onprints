@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getBoards as dbGetBoards, createBoard as dbCreateBoard,
   deleteBoard as dbDeleteBoard, renameBoard as dbRenameBoard,
+  seedPrintingProductionBoard,
   type DbBoard,
 } from '@/lib/db/production'
 import { getStockItems } from '@/lib/db/inventory'
@@ -250,12 +251,22 @@ export default function Sidebar() {
   })
 
   /* ── Production accordion ── */
-  const { data: boards = [] } = useQuery({
+  const { data: boards = [], isFetched: boardsFetched } = useQuery({
     queryKey: ['boards', shopId],
     queryFn: () => dbGetBoards(shopId),
     enabled: !!shopId,
     staleTime: 30_000,
   })
+  const [seedingBoard, setSeedingBoard] = useState(false)
+  useEffect(() => {
+    if (!boardsFetched || !shopId || seedingBoard) return
+    if (boards.some(b => b.type === 'production')) return
+    setSeedingBoard(true)
+    seedPrintingProductionBoard(shopId)
+      .then(() => qc.invalidateQueries({ queryKey: ['boards', shopId] }))
+      .catch(() => {})
+      .finally(() => setSeedingBoard(false))
+  }, [boardsFetched, shopId, boards, seedingBoard, qc])
   const [productionOpen, setProductionOpen]       = useState(false)
   const [showAddBoard, setShowAddBoard]           = useState(false)
   const [newBoardName, setNewBoardName]           = useState('')
