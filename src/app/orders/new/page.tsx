@@ -46,6 +46,8 @@ type CatalogItem = {
   sizes?: any
   optionGroups?: any[]
   bulkVariant?: boolean
+  pricing?: any
+  basePrice?: number
 }
 
 function dbProductToCatalogItem(p: DbProduct): CatalogItem {
@@ -55,6 +57,8 @@ function dbProductToCatalogItem(p: DbProduct): CatalogItem {
     sizes: (p.sizes && Object.keys(p.sizes).length > 0) ? p.sizes : undefined,
     optionGroups: (p.option_groups && (p.option_groups as any[]).length > 0) ? p.option_groups as any[] : undefined,
     bulkVariant: p.bulk_variant,
+    pricing: p.pricing,
+    basePrice: p.base_price,
   }
 }
 
@@ -113,16 +117,29 @@ function computePrice(cfg: ConfigState): PriceResult {
     const qty = parseFloat(cfg.qty) || 0
     if (qty <= 0) return { ok: false, error: 'Enter a quantity.' }
     const sizeRow = sizes?.fixed.find((s: any) => s.label === cfg.size)
-    console.log('[computePrice] sizeRow:', JSON.stringify(sizeRow), 'sizes:', JSON.stringify(sizes))
-    const vt = (sizeRow?.volumeTiers ?? []).map((t: any) => ({
+    // Resolve volume tiers: size-level → product-level pricing → base price fallback
+    const pricing = cfg.item.pricing as any
+    const rawVt = sizeRow?.volumeTiers?.length ? sizeRow.volumeTiers
+      : pricing?.volumeTiers?.length ? pricing.volumeTiers
+      : null
+    const vt = rawVt ? rawVt.map((t: any) => ({
       minQty: parseInt(t.minQty) || 0,
       unitPrice: parseFloat(t.unitPrice) || 0,
-    })).filter((t: any) => t.minQty > 0 && t.unitPrice > 0)
-    if (!vt.length) return { ok: false, error: 'No pricing configured for this size.' }
-    // Admin orders: allow any qty, use closest tier's unit price
-    const sorted = [...vt].sort((a, b) => a.minQty - b.minQty)
-    const tier = [...sorted].reverse().find(t => qty >= t.minQty) || sorted[0]
-    br = { ok: true, price: tier.unitPrice * qty, label: `${qty} × RM ${tier.unitPrice.toFixed(2)}` }
+    })).filter((t: any) => t.minQty > 0 && t.unitPrice > 0) : []
+    // If no volume tiers, fall back to base price
+    if (!vt.length) {
+      const bp = parseFloat(sizeRow?.basePrice || String(cfg.item.basePrice || 0)) || 0
+      if (bp > 0) {
+        br = { ok: true, price: bp * qty, label: `${qty} × RM ${bp.toFixed(2)}` }
+      } else {
+        return { ok: false, error: 'No pricing configured for this size.' }
+      }
+    } else {
+      // Admin orders: allow any qty, use closest tier's unit price
+      const sorted = [...vt].sort((a, b) => a.minQty - b.minQty)
+      const tier = [...sorted].reverse().find(t => qty >= t.minQty) || sorted[0]
+      br = { ok: true, price: tier.unitPrice * qty, label: `${qty} × RM ${tier.unitPrice.toFixed(2)}` }
+    }
   }
 
   if (!br.ok) return { ok: false, error: br.error }
@@ -817,7 +834,7 @@ export default function NewOrderPage() {
                       else setConfig(p => p ? { ...p, qtyMode: 'preset', qty: v } : null)
                     }}
                     options={[
-                      ...(cfgSizeRow?.volumeTiers ?? []).filter((t: any) => t.minQty).map((t: any) => ({
+                      ...((cfgSizeRow?.volumeTiers?.length ? cfgSizeRow.volumeTiers : (config.item.pricing as any)?.volumeTiers) ?? []).filter((t: any) => t.minQty).map((t: any) => ({
                         value: String(t.minQty),
                         label: String(t.minQty),
                       })),
