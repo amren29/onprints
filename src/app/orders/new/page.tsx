@@ -111,12 +111,17 @@ function computePrice(cfg: ConfigState): PriceResult {
     })
   } else {
     const qty = parseFloat(cfg.qty) || 0
+    if (qty <= 0) return { ok: false, error: 'Enter a quantity.' }
     const sizeRow = sizes?.fixed.find((s: any) => s.label === cfg.size)
     const vt = (sizeRow?.volumeTiers ?? []).map((t: any) => ({
       minQty: parseInt(t.minQty) || 0,
       unitPrice: parseFloat(t.unitPrice) || 0,
     })).filter((t: any) => t.minQty > 0 && t.unitPrice > 0)
-    br = calcBasePrice('volume', qty, { volumeTiers: vt })
+    if (!vt.length) return { ok: false, error: 'No pricing configured for this size.' }
+    // Admin orders: allow any qty, use closest tier's unit price
+    const sorted = [...vt].sort((a, b) => a.minQty - b.minQty)
+    const tier = [...sorted].reverse().find(t => qty >= t.minQty) || sorted[0]
+    br = { ok: true, price: tier.unitPrice * qty, label: `${qty} × RM ${tier.unitPrice.toFixed(2)}` }
   }
 
   if (!br.ok) return { ok: false, error: br.error }
