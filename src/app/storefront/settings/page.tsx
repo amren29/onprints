@@ -7,6 +7,7 @@ import CustomSelect from '@/components/CustomSelect'
 import { getStoreSettings, saveStoreSettings } from '@/lib/db/storefront'
 import { useShop } from '@/providers/shop-provider'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
 
 const MALAYSIAN_BANKS = [
   'Maybank', 'CIMB Bank', 'Public Bank', 'RHB Bank', 'Hong Leong Bank',
@@ -43,10 +44,22 @@ const CardIcon = () => (
     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
   </svg>
 )
+const UserIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+  </svg>
+)
+const CameraIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+    <circle cx="12" cy="13" r="4"/>
+  </svg>
+)
 
-type Tab = 'info' | 'contact' | 'social' | 'payment'
+type Tab = 'account' | 'info' | 'contact' | 'social' | 'payment'
 
 const NAV: { key: Tab; label: string; icon: () => React.ReactNode; desc: string }[] = [
+  { key: 'account',  label: 'Account',    icon: UserIcon,      desc: 'Profile & personal info' },
   { key: 'info',     label: 'Store Info', icon: StoreIcon,     desc: 'Name, tagline & branding' },
   { key: 'contact',  label: 'Contact',    icon: PhoneIcon,     desc: 'Email, phone & address' },
   { key: 'social',   label: 'Social',     icon: GlobeIcon,     desc: 'Social media links' },
@@ -130,7 +143,7 @@ export default function StoreSettingsPage() {
   const [tab, setTab] = useState<Tab>(() => {
     const t = searchParams.get('tab')
     if (t && NAV.some(n => n.key === t)) return t as Tab
-    return 'info'
+    return 'account'
   })
   const [hovered, setHovered] = useState<Tab | null>(null)
   const [s, setS] = useState<Record<string, unknown> | null>(null)
@@ -250,6 +263,10 @@ export default function StoreSettingsPage() {
 
           <div key={tab} style={{ animation: 'ssFadeIn 0.25s ease' }}>
 
+            {tab === 'account' && (
+              <AccountSection onSave={showToast} />
+            )}
+
             {tab === 'info' && (
               <div className="card" style={{ padding: 24, maxWidth: 640 }}>
                 <SectionHeader title="Store Information" sub="Displayed in the storefront header and footer" />
@@ -349,6 +366,96 @@ export default function StoreSettingsPage() {
         </div>
       </div>
     </MyStoreShell>
+  )
+}
+
+/* ── Account Section ──────────────────────────────── */
+function AccountSection({ onSave }: { onSave: (msg: string) => void }) {
+  const [name, setName]   = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+
+  useEffect(() => {
+    try {
+      const supabase = createClient()
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) {
+          setName(data.user.user_metadata?.name || '')
+          setEmail(data.user.email || '')
+          setPhone(data.user.user_metadata?.phone || '')
+        }
+      }).catch(() => {})
+    } catch { /* env vars not ready */ }
+  }, [])
+
+  const handleSave = async () => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.updateUser({ data: { name, phone } })
+      if (error) { alert('Failed to save: ' + error.message); return }
+      onSave('Account saved')
+    } catch (err) {
+      console.error('Failed to save account:', err)
+    }
+  }
+
+  const avatarInitials = name.trim().split(/\s+/).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('') || '?'
+
+  const acCardStyle: React.CSSProperties = {
+    padding: 24, borderRadius: 12,
+    background: 'var(--bg-card)', border: '1px solid var(--border)',
+  }
+  const acLabel: React.CSSProperties = {
+    fontSize: 11, fontWeight: 700, color: 'var(--text-muted)',
+    textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14,
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 640 }}>
+      <SectionHeader title="My Account" sub="Manage your personal profile and contact details" />
+
+      {/* Avatar */}
+      <div style={acCardStyle}>
+        <div style={acLabel}>Profile Photo</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--info-bg)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, border: '2px solid var(--accent)' }}>
+              {avatarInitials}
+            </div>
+            <button style={{ position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: '50%', background: 'var(--accent)', border: '2px solid var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff' }}>
+              <CameraIcon />
+            </button>
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{name || 'No name set'}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>JPG, PNG or GIF · Max 2MB</div>
+            <button className="btn-secondary" style={{ fontSize: 12, padding: '6px 14px' }}>Upload Photo</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Personal Info */}
+      <div style={acCardStyle}>
+        <div style={acLabel}>Personal Information</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <label className="form-group">
+            <span className="form-label" style={{ fontWeight: 600 }}>Full Name</span>
+            <input className="form-input" value={name} onChange={e => setName(e.target.value)} style={{ padding: '10px 12px' }} />
+          </label>
+          <label className="form-group">
+            <span className="form-label" style={{ fontWeight: 600 }}>Phone</span>
+            <input className="form-input" value={phone} onChange={e => setPhone(e.target.value)} style={{ padding: '10px 12px' }} />
+          </label>
+          <label className="form-group" style={{ gridColumn: '1 / -1' }}>
+            <span className="form-label" style={{ fontWeight: 600 }}>Email Address</span>
+            <input className="form-input" type="email" value={email} disabled style={{ padding: '10px 12px', opacity: 0.6 }} />
+          </label>
+        </div>
+        <div style={footerBar}>
+          <button className="btn-primary" onClick={handleSave}>Save Changes</button>
+        </div>
+      </div>
+    </div>
   )
 }
 
