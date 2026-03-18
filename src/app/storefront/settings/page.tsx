@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import MyStoreShell from '@/components/MyStoreShell'
 import CustomSelect from '@/components/CustomSelect'
 import { getStoreSettings, saveStoreSettings } from '@/lib/db/storefront'
@@ -123,6 +123,7 @@ const footerBar: React.CSSProperties = {
 
 export default function StoreSettingsPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { shopId } = useShop()
   const qc = useQueryClient()
 
@@ -199,6 +200,17 @@ export default function StoreSettingsPage() {
         <div>
           <div className="page-title">Store Settings</div>
           <div className="page-subtitle">Manage your online store configuration</div>
+        </div>
+        <div className="page-actions">
+          <button className="btn-secondary" style={{ color: 'var(--negative)', borderColor: 'var(--negative)', gap: 6 }} onClick={async () => {
+            const { createClient } = await import('@/lib/supabase/client')
+            const supabase = createClient()
+            await supabase.auth.signOut()
+            router.push('/login')
+          }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log out
+          </button>
         </div>
       </div>
 

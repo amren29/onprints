@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 // TODO [Batch H]: Replace with DB-backed store settings
 import { getStoreSettings } from '@/lib/store-settings-store'
 
@@ -121,13 +121,13 @@ const NAV = [
   { label: 'Abandoned Carts',href: '/storefront/abandoned-carts',icon: CartsIcon },
   { label: 'Reviews',        href: '/storefront/reviews',        icon: ReviewsIcon },
   { label: 'Affiliates',     href: '/storefront/affiliates',     icon: AffiliatesIcon },
-  { label: 'Membership',    href: '/storefront/membership',     icon: MembershipIcon },
   { label: 'Analytics',      href: '/storefront/analytics',      icon: AnalyticsIcon },
 ]
 
 /* ── Component ─────────────────────────────────────── */
 export default function MyStoreSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false
     return sessionStorage.getItem('store-sidebar-collapsed') === '1'
@@ -185,7 +185,7 @@ export default function MyStoreSidebar() {
 
       {/* Footer */}
       <div className="sidebar-footer">
-        <div className="user-profile">
+        <div className="user-profile" onClick={() => router.push('/storefront/settings')} style={{ cursor: 'pointer' }}>
           <div className="user-avatar">{(getStoreSettings().storeName || 'A').slice(0, 2).toUpperCase()}</div>
           <div className="user-info">
             <div className="user-name">{getStoreSettings().storeName || 'Admin'}</div>

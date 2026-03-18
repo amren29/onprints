@@ -1288,6 +1288,16 @@ export default function SettingsPage() {
           <div className="page-title">Settings</div>
           <div className="page-subtitle">Manage your account, organisation and preferences</div>
         </div>
+        <div className="page-actions">
+          <button className="btn-secondary" style={{ color: 'var(--negative)', borderColor: 'var(--negative)', gap: 6 }} onClick={async () => {
+            const supabase = (await import('@/lib/supabase/client')).createClient()
+            await supabase.auth.signOut()
+            window.location.href = '/login'
+          }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log out
+          </button>
+        </div>
       </div>
 
       <div className="page-scroll">

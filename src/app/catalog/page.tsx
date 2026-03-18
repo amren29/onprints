@@ -70,6 +70,7 @@ export default function CatalogPage() {
 
   const [tab, setTab]               = useState('All')
   const [search, setSearch]         = useState('')
+  const [selected, setSelected]     = useState<Set<string>>(new Set())
   const [delTarget, setDelTarget]   = useState<DbProduct | null>(null)
 
   const deleteMut = useMutation({
@@ -110,7 +111,7 @@ export default function CatalogPage() {
       <CreateToast param="saved" title="Product updated successfully" subtitle="Changes have been saved" basePath="/catalog" />
       <div className="page-header">
         <div>
-          <div className="page-title">Catalog</div>
+          <div className="page-title">Products</div>
           <div className="page-subtitle">{items.length} products · {uniqueCats} categories</div>
         </div>
         <div className="page-actions">
@@ -157,14 +158,29 @@ export default function CatalogPage() {
         <div className="card">
           <table className="data-table">
             <thead>
-              <tr><th>Product</th><th>SKU</th><th>Category</th><th>Price</th><th>Pricing</th><th>Status</th><th>Visibility</th><th></th></tr>
+              <tr>
+                <th style={{ width: 36 }}>
+                  <input type="checkbox" checked={filtered.length > 0 && selected.size === filtered.length} onChange={e => {
+                    if (e.target.checked) setSelected(new Set(filtered.map(c => c.id)))
+                    else setSelected(new Set())
+                  }} style={{ cursor: 'pointer', accentColor: 'var(--accent)' }} />
+                </th>
+                <th>Product</th><th>SKU</th><th>Category</th><th>Price</th><th>Pricing</th><th>Status</th><th>Visibility</th><th></th>
+              </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 && <tr><td colSpan={8}><div className="empty-state">No products found</div></td></tr>}
+              {filtered.length === 0 && <tr><td colSpan={9}><div className="empty-state">No products found</div></td></tr>}
               {filtered.map(c => {
                 const pricing = PRICING_BADGE[c.pricing_type] ?? PRICING_BADGE['volume']
                 return (
                   <tr key={c.id} style={{ cursor: 'pointer' }} onClick={() => router.push(`/catalog/${c.id}`)}>
+                    <td onClick={e => e.stopPropagation()}>
+                      <input type="checkbox" checked={selected.has(c.id)} onChange={e => {
+                        const next = new Set(selected)
+                        if (e.target.checked) next.add(c.id); else next.delete(c.id)
+                        setSelected(next)
+                      }} style={{ cursor: 'pointer', accentColor: 'var(--accent)' }} />
+                    </td>
                     <td>
                       <button onClick={() => router.push(`/catalog/${c.id}`)} style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font)', textAlign: 'left' }}>{c.name}</button>
                       <div className="cell-sub">{c.seq_id}</div>

@@ -7,7 +7,7 @@ import AppShell from '@/components/AppShell'
 import CreateToast from '@/components/CreateToast'
 import ConfirmModal from '@/components/ConfirmModal'
 import ViewModal, { ViewRow, SectionLabel } from '@/components/ViewModal'
-import { getMembershipRequests, updateMembershipRequest, deleteMembershipRequest, type DbMembershipRequest } from '@/lib/db/memberships'
+import { getMembershipRequests, updateMembershipRequest, deleteMembershipRequest, createMembership, updateMembership, deleteMembership, type DbMembershipRequest, type DbMembership } from '@/lib/db/memberships'
 import { getMemberships } from '@/lib/db/memberships'
 import { activateStoreMembership, suspendStoreMembership, deactivateStoreMembership, deleteStoreMembership, completeStoreMembershipPurchases } from '@/lib/store/auth-store' // TODO: migrate to Supabase
 import Pagination, { usePagination } from '@/components/Pagination'
@@ -15,14 +15,21 @@ import RowMenu from '@/components/RowMenu'
 import BulkActionBar, { BulkCheckbox, useBulkSelect } from '@/components/BulkActionBar'
 import StatusSelect from '@/components/StatusSelect'
 import { useShop } from '@/providers/shop-provider'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
 type MembershipRequest = DbMembershipRequest
 const fmt = (n: number) => `RM ${(n ?? 0).toLocaleString('en-MY', { minimumFractionDigits: 2 })}`
+const fmtShort = (n: number) => `RM ${(n ?? 0).toLocaleString('en-MY', { minimumFractionDigits: 0 })}`
 
 const SearchIcon = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>)
 const CardIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>)
 const PlusIcon = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>)
+const CloseIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>)
+
+interface TierForm { name: string; price: string; discountRate: string; durationMonths: string; description: string }
+const emptyTierForm: TierForm = { name: '', price: '', discountRate: '', durationMonths: '12', description: '' }
+
+const MAIN_TABS = ['Membership', 'Membership Tiers'] as const
 
 const STATUS_BADGE: Record<string, string> = {
   pending: 'badge badge-warning',
@@ -54,12 +61,48 @@ export default function MembershipApprovalsPage() {
     enabled: !!shopId,
   })
 
+  const [mainTab, setMainTab] = useState<typeof MAIN_TABS[number]>('Membership')
   const [tab, setTab] = useState('All')
   const [search, setSearch] = useState('')
   const [viewTarget, setViewTarget] = useState<MembershipRequest | null>(null)
   const [approveTarget, setApproveTarget] = useState<MembershipRequest | null>(null)
   const [rejectTarget, setRejectTarget] = useState<MembershipRequest | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<MembershipRequest | null>(null)
+
+  // ── Tier management state ──
+  const [tierModalOpen, setTierModalOpen] = useState(false)
+  const [tierEditId, setTierEditId] = useState<string | null>(null)
+  const [tierForm, setTierForm] = useState<TierForm>(emptyTierForm)
+  const [tierTried, setTierTried] = useState(false)
+  const [tierDelId, setTierDelId] = useState<string | null>(null)
+
+  const createTierMut = useMutation({
+    mutationFn: (data: Parameters<typeof createMembership>[1]) => createMembership(shopId, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['memberships', shopId] }),
+  })
+  const updateTierMut = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updateMembership>[2] }) => updateMembership(shopId, id, updates),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['memberships', shopId] }),
+  })
+  const deleteTierMut = useMutation({
+    mutationFn: (id: string) => deleteMembership(shopId, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['memberships', shopId] }),
+  })
+
+  const openAddTier = () => { setTierEditId(null); setTierForm(emptyTierForm); setTierTried(false); setTierModalOpen(true) }
+  const openEditTier = (t: DbMembership) => {
+    setTierEditId(t.id)
+    setTierForm({ name: t.name, price: t.price.toString(), discountRate: t.discount_rate.toString(), durationMonths: t.duration_months.toString(), description: t.description || '' })
+    setTierTried(false); setTierModalOpen(true)
+  }
+  const handleSaveTier = () => {
+    setTierTried(true)
+    if (!tierForm.name.trim() || !tierForm.price || !tierForm.discountRate || !tierForm.durationMonths) return
+    const data = { name: tierForm.name.trim(), price: parseFloat(tierForm.price) || 0, discount_rate: parseFloat(tierForm.discountRate) || 0, duration_months: parseInt(tierForm.durationMonths) || 12, description: tierForm.description.trim() }
+    if (tierEditId) updateTierMut.mutate({ id: tierEditId, updates: data }); else createTierMut.mutate(data)
+    setTierModalOpen(false)
+  }
+  const handleDeleteTier = () => { if (tierDelId) { deleteTierMut.mutate(tierDelId); setTierDelId(null) } }
 
   const reload = () => qc.invalidateQueries({ queryKey: ['membershipRequests', shopId] })
 
@@ -152,10 +195,22 @@ export default function MembershipApprovalsPage() {
       <div className="page-header">
         <div><div className="page-title">Membership</div><div className="page-subtitle">Manage storefront membership subscriptions</div></div>
         <div className="page-actions">
-          <Link href="/membership-approvals/new" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}><PlusIcon /><span>New</span></Link>
+          {mainTab === 'Membership' ? (
+            <Link href="/membership-approvals/new" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}><PlusIcon /><span>New</span></Link>
+          ) : (
+            <button className="btn-primary" onClick={openAddTier} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><PlusIcon /> New Tier</button>
+          )}
         </div>
       </div>
 
+      {/* Main tabs */}
+      <div className="filter-bar" style={{ marginBottom: 16 }}>
+        {MAIN_TABS.map(t => (
+          <button key={t} className={`filter-tab${mainTab === t ? ' active' : ''}`} onClick={() => setMainTab(t)}>{t}</button>
+        ))}
+      </div>
+
+      {mainTab === 'Membership' && <>
       {/* Stat cards */}
       <div className="finance-stats">
         <div className="stat-card">
@@ -327,6 +382,104 @@ export default function MembershipApprovalsPage() {
         { label: 'Approve Selected', action: handleBulkApprove },
         { label: 'Delete Selected', action: handleBulkDelete, danger: true },
       ]} />
+      </>}
+
+      {/* ── Membership Tiers Tab ── */}
+      {mainTab === 'Membership Tiers' && <>
+        <div className="finance-stats">
+          <div className="stat-card">
+            <div className="stat-card-header"><div className="stat-card-label">Total Tiers</div></div>
+            <div className="stat-value">{tiers.length}</div>
+            <div className="stat-vs">membership plans</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-card-header"><div className="stat-card-label">Lowest Price</div></div>
+            <div className="stat-value" style={{ color: '#16a34a' }}>{tiers.length > 0 ? fmtShort(Math.min(...tiers.map(t => t.price))) : '—'}</div>
+            <div className="stat-vs">entry tier</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-card-header"><div className="stat-card-label">Highest Price</div></div>
+            <div className="stat-value" style={{ color: 'var(--purple-text)' }}>{tiers.length > 0 ? fmtShort(Math.max(...tiers.map(t => t.price))) : '—'}</div>
+            <div className="stat-vs">premium tier</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-card-header"><div className="stat-card-label">Max Discount</div></div>
+            <div className="stat-value" style={{ color: '#d97706' }}>{tiers.length > 0 ? `${Math.max(...tiers.map(t => t.discount_rate))}%` : '—'}</div>
+            <div className="stat-vs">best savings</div>
+          </div>
+        </div>
+
+        <div className="card">
+          <table className="data-table">
+            <thead>
+              <tr><th>Tier Name</th><th>Price</th><th>Discount</th><th>Duration</th><th>Description</th><th></th></tr>
+            </thead>
+            <tbody>
+              {tiers.length === 0 && <tr><td colSpan={6}><div className="empty-state">No membership tiers yet. Click &quot;New Tier&quot; to create one.</div></td></tr>}
+              {tiers.map(t => (
+                <tr key={t.id}>
+                  <td style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)' }}>{t.name}</td>
+                  <td style={{ fontWeight: 600, fontSize: 13, color: 'var(--accent)' }}>{fmtShort(t.price)}</td>
+                  <td style={{ fontWeight: 600, fontSize: 13 }}>{t.discount_rate}%</td>
+                  <td style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{t.duration_months} months</td>
+                  <td style={{ fontSize: 12.5, color: 'var(--text-secondary)', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.description || '—'}</td>
+                  <td onClick={e => e.stopPropagation()}>
+                    <RowMenu items={[
+                      { label: 'Edit', action: () => openEditTier(t) },
+                      { label: 'Delete', action: () => setTierDelId(t.id), danger: true },
+                    ]} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Add/Edit Tier Modal */}
+        {tierModalOpen && (
+          <div className="modal-overlay" onClick={() => setTierModalOpen(false)}>
+            <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
+              <div className="modal-header">
+                <div className="modal-title">{tierEditId ? 'Edit Tier' : 'New Membership Tier'}</div>
+                <button className="modal-close" onClick={() => setTierModalOpen(false)}><CloseIcon /></button>
+              </div>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div className="form-group">
+                  <label className="form-label">Tier Name <span style={{ color: 'var(--negative)' }}>*</span></label>
+                  <input className={`form-input${tierTried && !tierForm.name.trim() ? ' error' : ''}`} value={tierForm.name} onChange={e => setTierForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Gold" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <div className="form-group">
+                    <label className="form-label">Price (RM) <span style={{ color: 'var(--negative)' }}>*</span></label>
+                    <input className={`form-input${tierTried && !tierForm.price ? ' error' : ''}`} type="number" min={0} value={tierForm.price} onChange={e => setTierForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 999" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Discount Rate (%) <span style={{ color: 'var(--negative)' }}>*</span></label>
+                    <input className={`form-input${tierTried && !tierForm.discountRate ? ' error' : ''}`} type="number" min={0} max={100} value={tierForm.discountRate} onChange={e => setTierForm(f => ({ ...f, discountRate: e.target.value }))} placeholder="e.g. 20" />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Duration (months) <span style={{ color: 'var(--negative)' }}>*</span></label>
+                  <input className={`form-input${tierTried && !tierForm.durationMonths ? ' error' : ''}`} type="number" min={1} value={tierForm.durationMonths} onChange={e => setTierForm(f => ({ ...f, durationMonths: e.target.value }))} placeholder="e.g. 12" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Description</label>
+                  <textarea className="form-input" rows={3} value={tierForm.description} onChange={e => setTierForm(f => ({ ...f, description: e.target.value }))} placeholder="Brief description of this tier" style={{ resize: 'vertical' }} />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-secondary" onClick={() => setTierModalOpen(false)}>Cancel</button>
+                <button className="btn-primary" onClick={handleSaveTier}>{tierEditId ? 'Save Changes' : 'Create Tier'}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Tier Confirm */}
+        {tierDelId && (
+          <ConfirmModal title="Delete Membership Tier" message={`Permanently delete "${tiers.find(t => t.id === tierDelId)?.name ?? 'this tier'}"?`} onConfirm={handleDeleteTier} onCancel={() => setTierDelId(null)} />
+        )}
+      </>}
     </AppShell>
   )
 }

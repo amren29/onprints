@@ -192,9 +192,6 @@ export default function Sidebar() {
 
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
-  const [showUserMenu, setShowUserMenu] = useState(false)
-  const userMenuRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
     try {
       const supabase = createClient()
@@ -206,23 +203,6 @@ export default function Sidebar() {
       }).catch(() => {})
     } catch { /* env vars not ready */ }
   }, [])
-
-  useEffect(() => {
-    if (!showUserMenu) return
-    const handler = (e: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
-        setShowUserMenu(false)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [showUserMenu])
-
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
 
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -614,53 +594,8 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="sidebar-footer" style={{ position: 'relative' }} ref={userMenuRef}>
-        {showUserMenu && (
-          <div style={{
-            position: 'absolute',
-            bottom: 'calc(100% + 4px)',
-            left: 8,
-            right: 8,
-            background: 'var(--bg-card)',
-            borderRadius: 8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-            border: '1px solid var(--border)',
-            zIndex: 200,
-            padding: 4,
-          }}>
-            <Link
-              href="/settings"
-              onClick={() => setShowUserMenu(false)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                padding: '8px 12px', borderRadius: 6, fontSize: 12.5, fontWeight: 500,
-                color: 'var(--text-primary)', background: 'transparent', border: 'none',
-                cursor: 'pointer', fontFamily: 'var(--font)', textDecoration: 'none',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-              Settings
-            </Link>
-            <div style={{ height: 1, background: 'var(--border)', margin: '2px 8px' }} />
-            <button
-              onClick={handleLogout}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                padding: '8px 12px', borderRadius: 6, fontSize: 12.5, fontWeight: 500,
-                color: 'var(--negative)', background: 'transparent', border: 'none',
-                cursor: 'pointer', fontFamily: 'var(--font)', textAlign: 'left',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              Log out
-            </button>
-          </div>
-        )}
-        <div className="user-profile" onClick={() => setShowUserMenu(v => !v)} style={{ cursor: 'pointer' }}>
+      <div className="sidebar-footer">
+        <div className="user-profile" onClick={() => router.push('/settings')} style={{ cursor: 'pointer' }}>
           <div className="user-avatar">{(userName || userEmail || 'A').slice(0, 2).toUpperCase()}</div>
           <div className="user-info">
             <div className="user-name">{userName || userEmail || 'User'}</div>
