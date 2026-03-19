@@ -13,10 +13,14 @@ const ONPRINTS_BILLPLZ_EMAIL = process.env.ONPRINTS_BILLPLZ_EMAIL || 'platform@o
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { shopId, bankName, bankAccountNo, bankAccountName, billplzEmail } = body
+    const { shopId, bankName, bankAccountNo, bankAccountName } = body
 
-    if (!shopId || !bankName || !bankAccountNo || !bankAccountName || !billplzEmail) {
+    if (!shopId || !bankName || !bankAccountNo || !bankAccountName) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
+    }
+
+    if (!process.env.BILLPLZ_API_KEY) {
+      return NextResponse.json({ error: 'Billplz is not configured. Please add BILLPLZ_API_KEY to environment variables.' }, { status: 500 })
     }
 
     // Get shop's current plan to determine fixed_cut
@@ -51,7 +55,7 @@ export async function POST(req: NextRequest) {
         bank_name: bankName,
         bank_account_no: bankAccountNo,
         bank_account_name: bankAccountName,
-        billplz_email: billplzEmail,
+        billplz_email: ONPRINTS_BILLPLZ_EMAIL,
         billplz_collection_id: collection.id,
         payment_enabled: true,
         bank_verified: true,
