@@ -5,7 +5,8 @@ function getBase() {
 }
 
 function headers() {
-  const auth = Buffer.from(`${process.env.BILLPLZ_API_KEY}:`).toString('base64')
+  const key = process.env.BILLPLZ_API_KEY || ''
+  const auth = btoa(`${key}:`)
   return {
     'Authorization': `Basic ${auth}`,
     'Content-Type': 'application/json',
