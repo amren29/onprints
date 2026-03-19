@@ -137,7 +137,7 @@ const footerBar: React.CSSProperties = {
 export default function StoreSettingsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { shopId } = useShop()
+  const { shopId, isLoading: shopLoading } = useShop()
   const qc = useQueryClient()
 
   const [tab, setTab] = useState<Tab>(() => {
@@ -159,8 +159,8 @@ export default function StoreSettingsPage() {
   })
 
   // Hydrate from DB (or init empty for new shops with no settings row)
-  // If shopId is missing, still hydrate with empty config so the page isn't stuck on Loading
-  if (!hydrated && (isFetched || !shopId)) {
+  // Wait for shop to finish loading before hydrating
+  if (!hydrated && !shopLoading && (isFetched || !shopId)) {
     setS(settingsRow?.config as Record<string, unknown> ?? {})
     setHydrated(true)
   }
