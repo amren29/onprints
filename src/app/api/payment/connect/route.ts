@@ -38,9 +38,10 @@ export async function POST(req: NextRequest) {
     plan = shop.plan || 'starter'
     const fixedCut = PLAN_FEES[plan] ?? PLAN_FEES.starter
 
-    // Create Billplz collection with split payment
+    // Create Billplz collection with split payment (title max 50 chars)
+    const title = `${bankAccountName} - ${shopId}`.slice(0, 50)
     const collection = await createCollection(
-      `${bankAccountName} - ${shopId}`,
+      title,
       {
         email: platformEmail,
         fixed_cut: fixedCut,
