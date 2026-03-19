@@ -159,7 +159,8 @@ export default function StoreSettingsPage() {
   })
 
   // Hydrate from DB (or init empty for new shops with no settings row)
-  if (!hydrated && isFetched) {
+  // If shopId is missing, still hydrate with empty config so the page isn't stuck on Loading
+  if (!hydrated && (isFetched || !shopId)) {
     setS(settingsRow?.config as Record<string, unknown> ?? {})
     setHydrated(true)
   }
