@@ -10,12 +10,22 @@ export async function GET(req: NextRequest) {
 
     const { data: shop, error } = await supabase
       .from('shops')
-      .select('bank_name, bank_account_name, bank_account_no, billplz_email, billplz_collection_id, payment_enabled, bank_verified, plan, platform_fee_sen')
+      .select('*')
       .eq('id', shopId)
       .single()
 
     if (error || !shop) {
-      return NextResponse.json({ error: 'Shop not found' }, { status: 404 })
+      // Return default state instead of 404 so the UI still renders
+      return NextResponse.json({
+        bankConnected: false,
+        bankName: null,
+        bankAccountName: null,
+        bankAccountNo: null,
+        billplzEmail: null,
+        paymentEnabled: false,
+        plan: 'starter',
+        platformFeeSen: 100,
+      })
     }
 
     return NextResponse.json({

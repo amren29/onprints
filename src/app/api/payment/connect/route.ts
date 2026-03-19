@@ -8,8 +8,6 @@ const PLAN_FEES: Record<string, number> = {
   pro: 20,
 }
 
-const ONPRINTS_BILLPLZ_EMAIL = process.env.ONPRINTS_BILLPLZ_EMAIL || 'platform@onprints.my'
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -23,25 +21,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Billplz is not configured. Please add BILLPLZ_API_KEY to environment variables.' }, { status: 500 })
     }
 
-    // Get shop's current plan to determine fixed_cut
-    const { data: shop, error: fetchError } = await supabase
+    const platformEmail = process.env.ONPRINTS_BILLPLZ_EMAIL || 'platform@onprints.my'
+
+    // Get shop's current plan to determine fixed_cut (default to starter if column missing)
+    let plan = 'starter'
+    const { data: shop } = await supabase
       .from('shops')
-      .select('plan')
+      .select('id, plan')
       .eq('id', shopId)
       .single()
 
-    if (fetchError || !shop) {
-      return NextResponse.json({ error: 'Shop not found' }, { status: 404 })
+    if (!shop) {
+      return NextResponse.json({ error: 'Shop not found. Please refresh and try again.' }, { status: 404 })
     }
 
-    const plan = shop.plan || 'starter'
+    plan = shop.plan || 'starter'
     const fixedCut = PLAN_FEES[plan] ?? PLAN_FEES.starter
 
     // Create Billplz collection with split payment
     const collection = await createCollection(
       `${bankAccountName} - ${shopId}`,
       {
-        email: ONPRINTS_BILLPLZ_EMAIL,
+        email: platformEmail,
         fixed_cut: fixedCut,
         variable_cut: 0,
         split_header: true,
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
         bank_name: bankName,
         bank_account_no: bankAccountNo,
         bank_account_name: bankAccountName,
-        billplz_email: ONPRINTS_BILLPLZ_EMAIL,
+        billplz_email: platformEmail,
         billplz_collection_id: collection.id,
         payment_enabled: true,
         bank_verified: true,
