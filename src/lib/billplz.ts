@@ -1,12 +1,13 @@
-const BASE = process.env.BILLPLZ_SANDBOX === 'true'
-  ? 'https://www.billplz-sandbox.com/api/v3'
-  : 'https://www.billplz.com/api/v3'
-
-const AUTH = Buffer.from(`${process.env.BILLPLZ_API_KEY}:`).toString('base64')
+function getBase() {
+  return process.env.BILLPLZ_SANDBOX === 'true'
+    ? 'https://www.billplz-sandbox.com/api/v3'
+    : 'https://www.billplz.com/api/v3'
+}
 
 function headers() {
+  const auth = Buffer.from(`${process.env.BILLPLZ_API_KEY}:`).toString('base64')
   return {
-    'Authorization': `Basic ${AUTH}`,
+    'Authorization': `Basic ${auth}`,
     'Content-Type': 'application/json',
   }
 }
@@ -21,7 +22,7 @@ export async function createCollection(title: string, splitPayment?: {
 }) {
   const body: Record<string, unknown> = { title }
 
-  const res = await fetch(`${BASE}/collections`, {
+  const res = await fetch(`${getBase()}/collections`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify(body),
@@ -36,7 +37,7 @@ export async function createCollection(title: string, splitPayment?: {
 
   // If split payment is needed, activate it via the split_payments endpoint
   if (splitPayment) {
-    const splitRes = await fetch(`${BASE}/collections/${collection.id}/split_payments`, {
+    const splitRes = await fetch(`${getBase()}/collections/${collection.id}/split_payments`, {
       method: 'POST',
       headers: headers(),
       body: JSON.stringify({
@@ -57,7 +58,7 @@ export async function createCollection(title: string, splitPayment?: {
 }
 
 export async function getCollection(collectionId: string) {
-  const res = await fetch(`${BASE}/collections/${collectionId}`, {
+  const res = await fetch(`${getBase()}/collections/${collectionId}`, {
     method: 'GET',
     headers: headers(),
   })
@@ -87,7 +88,7 @@ interface CreateBillParams {
 }
 
 export async function createBill(params: CreateBillParams) {
-  const res = await fetch(`${BASE}/bills`, {
+  const res = await fetch(`${getBase()}/bills`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify({
@@ -114,7 +115,7 @@ export async function createBill(params: CreateBillParams) {
 }
 
 export async function getBill(billId: string) {
-  const res = await fetch(`${BASE}/bills/${billId}`, {
+  const res = await fetch(`${getBase()}/bills/${billId}`, {
     method: 'GET',
     headers: headers(),
   })
