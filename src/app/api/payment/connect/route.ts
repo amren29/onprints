@@ -17,10 +17,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
     }
 
-    if (!process.env.BILLPLZ_API_KEY) {
-      return NextResponse.json({ error: 'Billplz is not configured. Please add BILLPLZ_API_KEY to environment variables.' }, { status: 500 })
-    }
-
     const platformEmail = process.env.ONPRINTS_BILLPLZ_EMAIL || 'platform@onprints.my'
 
     // Get shop's current plan to determine fixed_cut (default to starter if column missing)
