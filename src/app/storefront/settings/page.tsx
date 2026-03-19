@@ -347,7 +347,11 @@ export default function StoreSettingsPage() {
 
             {tab === 'payment' && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'start' }}>
-                <BankConnectionCard shopId={shopId} />
+                {shopId ? <BankConnectionCard shopId={shopId} /> : (
+                  <div className="card" style={{ padding: 24 }}>
+                    <SectionHeader title="Bank Account" sub="Shop is still loading. Please refresh the page." />
+                  </div>
+                )}
                 <div className="card" style={{ padding: 24 }}>
                   <SectionHeader title="Payment Methods" sub="Select which methods customers can choose at checkout" />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
