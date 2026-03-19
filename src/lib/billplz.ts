@@ -30,8 +30,8 @@ export async function createCollection(title: string, splitPayment?: {
   })
 
   if (!res.ok) {
-    const err = await res.json()
-    throw new Error(`Billplz createCollection failed: ${JSON.stringify(err)}`)
+    const err = await res.text()
+    throw new Error(`Billplz createCollection failed (${res.status}): ${err.slice(0, 300)}`)
   }
 
   const collection = await res.json()
