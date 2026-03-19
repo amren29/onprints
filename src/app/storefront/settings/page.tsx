@@ -561,6 +561,15 @@ function BankConnectionCard({ shopId }: { shopId: string }) {
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{planInfo.label} &mdash; {planInfo.fee}/txn</div>
             </div>
           </div>
+          <div style={{ marginTop: 16 }}>
+            <button className="btn-secondary" onClick={() => {
+              setStatus({ ...status, bankConnected: false })
+              setBankAccountNoConfirm('')
+              setMismatchError(false)
+            }} style={{ fontSize: 12 }}>
+              Change Bank Account
+            </button>
+          </div>
         </>
       ) : (
         <>
